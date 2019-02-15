@@ -1,25 +1,37 @@
 Package: tdigest
 Type: Package
-Title: tdigest title goes here otherwise CRAN checks fail
+Title: Accurate Quantiles Using 't-Digests'
 Version: 0.1.0
 Date: 2019-02-15
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
-           comment = c(ORCID = "0000-0001-5670-2640"))
+           comment = c(ORCID = "0000-0001-5670-2640")),
+    person("Gabriel", "Pichot", role = "aut", comment = "Original C++ coode")
   )
 Maintainer: Bob Rudis <bob@rud.is>
-Description: A good description goes here otherwise CRAN checks fail.
+Description: The t-digest construction algorithm uses a variant of 1-dimensional 
+    k-means clustering to produce a very compact data structure that allows 
+    accurate estimation of quantiles. This t-digest data structure can be used 
+    to estimate quantiles, compute other rank statistics or even to estimate 
+    related measures like trimmed means. The advantage of the t-digest over 
+    previous digests for this purpose is that the t-digest handles data with 
+    full floating point resolution. With small changes, the t-digest can handle 
+    values from any ordered set for which we can compute something akin to a mean. 
+    The accuracy of quantile estimates produced by t-digests can be orders of 
+    magnitude more accurate than those produced by previous digest algorithms.
 URL: https://gitlab.com/hrbrmstr/tdigest
 BugReports: https://gitlab.com/hrbrmstr/tdigest/issues
+SystemRequirements: C++11
 Encoding: UTF-8
-License: AGPL
+License: MIT + file LICENSE
 Suggests:
     testthat,
     covr
 Depends:
     R (>= 3.2.0)
 Imports:
-    httr,
-    jsonlite
+    Rcpp
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
+LinkingTo: 
+    Rcpp
