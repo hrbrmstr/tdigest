@@ -14,7 +14,7 @@ options(width=120)
 
 # tdigest
 
-Accurate Quantiles Using 't-Digests'
+Wicked Fast, Accurate Quantiles Using 't-Digests'
 
 ## Description
 

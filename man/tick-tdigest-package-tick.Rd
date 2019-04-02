@@ -3,7 +3,7 @@
 \docType{package}
 \name{`tdigest-package`}
 \alias{`tdigest-package`}
-\title{Accurate Quantiles Using 't-Digests'}
+\title{Wicked Fast, Accurate Quantiles Using 't-Digests'}
 \description{
 The t-digest construction algorithm uses a variant of 1-dimensional
 k-means clustering to produce a very compact data structure that allows

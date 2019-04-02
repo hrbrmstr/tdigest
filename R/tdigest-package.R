@@ -1,4 +1,4 @@
-#' Accurate Quantiles Using 't-Digests'
+#' Wicked Fast, Accurate Quantiles Using 't-Digests'
 #'
 #' The t-digest construction algorithm uses a variant of 1-dimensional
 #' k-means clustering to produce a very compact data structure that allows

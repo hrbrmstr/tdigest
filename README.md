@@ -7,7 +7,7 @@ Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](h
 
 # tdigest
 
-Accurate Quantiles Using ‘t-Digests’
+Wicked Fast, Accurate Quantiles Using ‘t-Digests’
 
 ## Description
 
@@ -111,8 +111,8 @@ microbenchmark::microbenchmark(
 )
 ## Unit: microseconds
 ##        expr       min        lq        mean     median        uq       max neval
-##     tdigest     4.542     6.033    16.79928    20.5475    21.787    47.159   100
-##  r_quantile 62035.574 63652.134 66540.00544 64935.1235 68307.315 85123.407   100
+##     tdigest     4.384     5.852    14.97052    19.7935    20.605    45.605   100
+##  r_quantile 61410.296 63843.651 66915.48513 65579.5825 68575.077 88666.206   100
 ```
 
 ## tdigest Metrics

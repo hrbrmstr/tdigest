@@ -1,6 +1,6 @@
 Package: tdigest
 Type: Package
-Title: Accurate Quantiles Using 't-Digests'
+Title: Wicked Fast, Accurate Quantiles Using 't-Digests'
 Version: 0.1.0
 Date: 2019-02-15
 Authors@R: c(
