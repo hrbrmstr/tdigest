@@ -10,7 +10,7 @@ options(width=120)
 
 [![Travis-CI Build Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest) 
 [![Coverage Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/hrbrmstr/tdigest)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
 
 # tdigest
 

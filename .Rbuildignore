@@ -5,6 +5,7 @@
 ^\.travis\.yml$
 ^README\.*Rmd$
 ^README\.*html$
+^CONDUCT\.md$
 ^NOTES\.*Rmd$
 ^NOTES\.*html$
 ^\.codecov\.yml$

@@ -19,5 +19,4 @@
 #' @docType package
 #' @author Bob Rudis (bob@@rud.is)
 #' @useDynLib tdigest, .registration = TRUE
-#' @importFrom Rcpp sourceCpp
 NULL
