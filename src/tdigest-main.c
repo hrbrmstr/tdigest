@@ -28,9 +28,9 @@ static void td_finalizer(SEXP ptr) {
   R_ClearExternalPtr(ptr); /* not really needed */
 }
 
-SEXP Rtd_create(double compression) {
+SEXP Rtd_create(SEXP compression) {
   SEXP ptr;
-  td_histogram_t *t = td_new(compression);
+  td_histogram_t *t = td_new(asReal(compression));
   if (t) {
     ptr = R_MakeExternalPtr(t, install("tdigest"), R_NilValue);
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
@@ -39,6 +39,38 @@ SEXP Rtd_create(double compression) {
   } else {
     return(R_NilValue);
   }
+}
+
+SEXP Rtdig(SEXP vec, SEXP compression) {
+  SEXP ptr;
+  td_histogram_t *t = td_new(asReal(compression));
+  if (t) {
+    R_xlen_t n = xlength(vec);
+    for (R_xlen_t i = 0; i < n; i++) {
+      td_add(t, REAL(vec)[i], 1);
+    }
+    ptr = R_MakeExternalPtr(t, install("tdigest"), R_NilValue);
+    R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
+    setAttrib(ptr, install("class"), mkString("tdigest"));
+    return(ptr);
+  } else {
+    return(R_NilValue);
+  }
+}
+
+SEXP Rtquant(SEXP tdig, SEXP probs) {
+  td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
+  if (t) {
+    R_xlen_t n = xlength(probs);
+    SEXP out = PROTECT(allocVector(REALSXP, n));
+    double *o = REAL(out);
+    for (R_xlen_t i = 0; i < n; i++) {
+      o[i] = td_value_at(t, REAL(probs)[i]);
+    }
+    UNPROTECT(1);
+    return(out);
+  }
+  return(R_NilValue);
 }
 
 SEXP Rtd_add(SEXP tdig, SEXP val, SEXP count) {

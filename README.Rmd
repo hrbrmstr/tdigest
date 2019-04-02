@@ -24,6 +24,15 @@ The t-digest construction algorithm uses a variant of 1-dimensional k-means clus
 
 The following functions are implemented:
 
+- `tdigest`:	Create a new t-digest histogram from a vector
+- `td_add`:	Add a value to the t-digest with the specified count
+- `td_create`:	Allocate a new histogram
+- `td_merge`:	Merge one t-digest into another
+- `td_quantile_of`:	Return the quantile of the value
+- `td_total_count`:	Total items contained in the t-digest
+- `td_value_at`:	Return the value at the specified quantile
+- `tquantile`:	Create a new t-digest histogram from a vector
+
 ## Installation
 
 ```{r install-ex, eval=FALSE}
@@ -42,6 +51,50 @@ library(tdigest)
 # current version
 packageVersion("tdigest")
 
+```
+
+### Basic (Low-level interface)
+
+```{r}
+td <- td_create(10)
+
+td
+
+td_total_count(td)
+
+td_add(td, 0, 1) %>% 
+  td_add(10, 1)
+
+td_total_count(td)
+
+td_value_at(td, 0.1) == 0
+td_value_at(td, 0.5) == 5
+```
+
+#### Bigger (and Vectorised)
+
+```{r}
+td <- tdigest(c(0, 10), 10)
+
+td_value_at(td, 0.1) == 0
+td_value_at(td, 0.5) == 5
+
+set.seed(1492)
+x <- sample(0:100, 1000000, replace = TRUE)
+td <- tdigest(x, 1000)
+
+td_total_count(td)
+
+tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+```
+
+#### Proof it's faster
+
+```{r}
+microbenchmark::microbenchmark(
+  tdigest = tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1)),
+  r_quantile = quantile(x, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+)
 ```
 
 ## tdigest Metrics

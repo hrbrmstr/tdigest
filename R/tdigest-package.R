@@ -15,7 +15,8 @@
 #' - BugReports: <https://gitlab.com/hrbrmstr/tdigest/issues>
 #'
 #' @md
-#' @name tdigest
+#' @name `tdigest-package`
+#' @keywords internal
 #' @docType package
 #' @author Bob Rudis (bob@@rud.is)
 #' @useDynLib tdigest, .registration = TRUE
