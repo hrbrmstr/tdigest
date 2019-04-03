@@ -48,6 +48,6 @@ expect_identical(
 )
 
 expect_identical(
-  as.integer(quantile(td)),
-  c(0L, 24L, 50L, 75L, 100L)
+  ceiling(quantile(td)),
+  c(0, 25, 51, 76, 100)
 )

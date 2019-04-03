@@ -9,7 +9,7 @@ Authors@R: c(
     person("Ted", "Dunning", role = "aut",
            comment = "t-Digest algorithm; <https://github.com/tdunning/t-digest/>"),
     person("ajwerner", "", role = "aut", 
-           comment = "Original C+ coode; <https://github.com/ajwerner/tdigest>")
+           comment = "Original C+ code; <https://github.com/ajwerner/tdigest>")
   )
 Maintainer: Bob Rudis <bob@rud.is>
 Description: The t-digest construction algorithm uses a variant of 1-dimensional 
