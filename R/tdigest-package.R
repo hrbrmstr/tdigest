@@ -19,5 +19,7 @@
 #' @keywords internal
 #' @docType package
 #' @author Bob Rudis (bob@@rud.is)
+#' @importFrom stats quantile
+#' @references <https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf>
 #' @useDynLib tdigest, .registration = TRUE
 NULL

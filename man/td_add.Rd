@@ -16,3 +16,7 @@ td_add(td, val, count)
 \description{
 Add a value to the t-digest with the specified count
 }
+\examples{
+td <- td_create(10)
+td_add(td, 0, 1)
+}

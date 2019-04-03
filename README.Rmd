@@ -1,7 +1,7 @@
 ---
 output: rmarkdown::github_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 ```{r pkg-knitr-opts, include=FALSE}
 knitr::opts_chunk$set(collapse=TRUE, fig.retina=2, message=FALSE, warning=FALSE)
@@ -20,10 +20,13 @@ Wicked Fast, Accurate Quantiles Using 't-Digests'
 
 The t-digest construction algorithm uses a variant of 1-dimensional k-means clustering to produce a very compact data structure that allows accurate estimation of quantiles. This t-digest data structure can be used to estimate quantiles, compute other rank statistics or even to estimate related measures like trimmed means. The advantage of the t-digest over previous digests for this purpose is that the t-digest handles data with full floating point resolution. With small changes, the t-digest can handle values from any ordered set for which we can compute something akin to a mean. The accuracy of quantile estimates produced by t-digests can be orders of magnitude more accurate than those produced by previous digest algorithms.
 
+See [the original paper by Ted Dunning](https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf) for more details on t-Digests.
+
 ## What's Inside The Tin
 
 The following functions are implemented:
 
+- `is_tdigest`: Test to see if an object is classed as `tdigest`
 - `tdigest`:	Create a new t-digest histogram from a vector
 - `td_add`:	Add a value to the t-digest with the specified count
 - `td_create`:	Allocate a new histogram
@@ -31,14 +34,16 @@ The following functions are implemented:
 - `td_quantile_of`:	Return the quantile of the value
 - `td_total_count`:	Total items contained in the t-digest
 - `td_value_at`:	Return the value at the specified quantile
-- `tquantile`:	Create a new t-digest histogram from a vector
+- `tquantile`:	Calcuate sample quantiles from a t-digest
 
 ## Installation
 
 ```{r install-ex, eval=FALSE}
+install.packages("tdigest", repos="https://cinc.rud.is/")
+# or 
 devtools::install_git("https://sr.ht.com/~hrbrmstr/tdigest.git")
 # or
-devtools::install_git("https://gitlab.com/hrbrmstr/tdigest.git")
+devtools::install_gitlab("hrbrmstr/tdigest")
 # or (if you must)
 devtools::install_github("hrbrmstr/tdigest")
 ```
@@ -69,12 +74,16 @@ td_total_count(td)
 
 td_value_at(td, 0.1) == 0
 td_value_at(td, 0.5) == 5
+
+quantile(td)
 ```
 
 #### Bigger (and Vectorised)
 
 ```{r}
 td <- tdigest(c(0, 10), 10)
+
+is_tdigest(td)
 
 td_value_at(td, 0.1) == 0
 td_value_at(td, 0.5) == 5
@@ -85,15 +94,17 @@ td <- tdigest(x, 1000)
 
 td_total_count(td)
 
-tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
+
+quantile(td)
 ```
 
 #### Proof it's faster
 
 ```{r}
 microbenchmark::microbenchmark(
-  tdigest = tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1)),
-  r_quantile = quantile(x, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+  tdigest = tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1)),
+  r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ```
 

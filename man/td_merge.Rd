@@ -11,6 +11,8 @@ td_merge(from, into)
 }
 \value{
 \code{into}
+
+a tdigest object
 }
 \description{
 Merge one t-digest into another

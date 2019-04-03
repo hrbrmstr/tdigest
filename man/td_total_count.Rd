@@ -12,3 +12,8 @@ td_total_count(td)
 \description{
 Total items contained in the t-digest
 }
+\examples{
+td <- td_create(10)
+td_add(td, 0, 1)
+td_total_count(td)
+}

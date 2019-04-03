@@ -4,13 +4,32 @@
 \alias{tdigest}
 \title{Create a new t-digest histogram from a vector}
 \usage{
-tdigest(vec, compression)
+tdigest(vec, compression = 100)
 }
 \arguments{
-\item{vec}{vector (will be converted to \code{double} if not already double}
+\item{vec}{vector (will be converted to \code{double} if not already double)}
 
-\item{compression}{compression}
+\item{compression}{the input compression value; should be >= 1.0; this
+will control how aggressively the TDigest compresses data together.
+The original t-Digest paper suggests using a value of 100 for a good
+balance between precision and efficiency. It will land at very small
+(think like 1e-6 percentile points) errors at extreme points in the
+distribution, and compression ratios of around 500 for large data sets
+(~1 million datapoints). Defaults to 100.}
+}
+\value{
+a tdigest object
 }
 \description{
 Create a new t-digest histogram from a vector
+}
+\examples{
+set.seed(1492)
+x <- sample(0:100, 1000000, replace = TRUE)
+td <- tdigest(x, 1000)
+tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
+quantile(td)
+}
+\references{
+\url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
 }

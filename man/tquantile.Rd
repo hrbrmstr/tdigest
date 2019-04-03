@@ -2,15 +2,35 @@
 % Please edit documentation in R/create.R
 \name{tquantile}
 \alias{tquantile}
-\title{Create a new t-digest histogram from a vector}
+\alias{quantile.tdigest}
+\title{Calcuate sample quantiles from a t-digest}
 \usage{
 tquantile(td, probs)
+
+\method{quantile}{tdigest}(x, probs = seq(0, 1, 0.25), ...)
 }
 \arguments{
 \item{td}{t-digest object}
 
 \item{probs}{numeric vector of probabilities with values in range 0:1}
+
+\item{x}{numeric vector whose sample quantiles are wanted}
+
+\item{...}{unused}
+}
+\value{
+a numeric vector
 }
 \description{
-Create a new t-digest histogram from a vector
+Calcuate sample quantiles from a t-digest
+}
+\examples{
+set.seed(1492)
+x <- sample(0:100, 1000000, replace = TRUE)
+td <- tdigest(x, 1000)
+tquantile(td, c(0, .01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
+quantile(td)
+}
+\references{
+\url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
 }

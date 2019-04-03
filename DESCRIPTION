@@ -1,11 +1,13 @@
 Package: tdigest
 Type: Package
 Title: Wicked Fast, Accurate Quantiles Using 't-Digests'
-Version: 0.1.0
-Date: 2019-02-15
+Version: 0.2.0
+Date: 2019-04-03
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0001-5670-2640")),
+    person("Ted", "Dunning", role = "aut",
+           comment = "t-Digest algorithm; <https://github.com/tdunning/t-digest/>"),
     person("ajwerner", "", role = "aut", 
            comment = "Original C+ coode; <https://github.com/ajwerner/tdigest>")
   )
@@ -22,7 +24,7 @@ Description: The t-digest construction algorithm uses a variant of 1-dimensional
     magnitude more accurate than those produced by previous digest algorithms.
 URL: https://gitlab.com/hrbrmstr/tdigest
 BugReports: https://gitlab.com/hrbrmstr/tdigest/issues
-SystemRequirements: C
+Copyright: file inst/COPYRIGHTS
 Encoding: UTF-8
 License: MIT + file LICENSE
 Suggests:
@@ -30,7 +32,9 @@ Suggests:
     covr
 Depends:
     R (>= 3.2.0)
+Imports: 
+    magrittr,
+    stats
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
-Imports: 
-    magrittr
+

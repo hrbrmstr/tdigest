@@ -23,10 +23,15 @@ compute something akin to a mean. The accuracy of quantile estimates
 produced by t-digests can be orders of magnitude more accurate than
 those produced by previous digest algorithms.
 
+See [the original paper by Ted
+Dunning](https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf)
+for more details on t-Digests.
+
 ## What’s Inside The Tin
 
 The following functions are implemented:
 
+  - `is_tdigest`: Test to see if an object is classed as `tdigest`
   - `tdigest`: Create a new t-digest histogram from a vector
   - `td_add`: Add a value to the t-digest with the specified count
   - `td_create`: Allocate a new histogram
@@ -34,14 +39,16 @@ The following functions are implemented:
   - `td_quantile_of`: Return the quantile of the value
   - `td_total_count`: Total items contained in the t-digest
   - `td_value_at`: Return the value at the specified quantile
-  - `tquantile`: Create a new t-digest histogram from a vector
+  - `tquantile`: Calcuate sample quantiles from a t-digest
 
 ## Installation
 
 ``` r
+install.packages("tdigest", repos="https://cinc.rud.is/")
+# or 
 devtools::install_git("https://sr.ht.com/~hrbrmstr/tdigest.git")
 # or
-devtools::install_git("https://gitlab.com/hrbrmstr/tdigest.git")
+devtools::install_gitlab("hrbrmstr/tdigest")
 # or (if you must)
 devtools::install_github("hrbrmstr/tdigest")
 ```
@@ -53,7 +60,7 @@ library(tdigest)
 
 # current version
 packageVersion("tdigest")
-## [1] '0.1.0'
+## [1] '0.2.0'
 ```
 
 ### Basic (Low-level interface)
@@ -78,12 +85,18 @@ td_value_at(td, 0.1) == 0
 ## [1] TRUE
 td_value_at(td, 0.5) == 5
 ## [1] TRUE
+
+quantile(td)
+## [1]  0  0  5 10 10
 ```
 
 #### Bigger (and Vectorised)
 
 ``` r
 td <- tdigest(c(0, 10), 10)
+
+is_tdigest(td)
+## [1] TRUE
 
 td_value_at(td, 0.1) == 0
 ## [1] TRUE
@@ -97,32 +110,35 @@ td <- tdigest(x, 1000)
 td_total_count(td)
 ## [1] 1e+06
 
-tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 ##  [1]   0.0000000   0.8632378   9.6763281  19.7028368  29.7718982  39.9706864  50.0032181  60.0859360  70.1951621
 ## [10]  80.2785864  90.3290326  99.5151872 100.0000000
+
+quantile(td)
+## [1]   0.00000  24.81839  50.00322  75.23076 100.00000
 ```
 
 #### Proof it’s faster
 
 ``` r
 microbenchmark::microbenchmark(
-  tdigest = tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1)),
-  r_quantile = quantile(x, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
+  tdigest = tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1)),
+  r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean     median        uq       max neval
-##     tdigest     4.384     5.852    14.97052    19.7935    20.605    45.605   100
-##  r_quantile 61410.296 63843.651 66915.48513 65579.5825 68575.077 88666.206   100
+##        expr       min        lq        mean     median         uq       max neval
+##     tdigest    26.334    31.162    61.02889    67.3605    71.0985   177.618   100
+##  r_quantile 61909.704 64146.167 66500.42677 65329.2830 68093.9355 78102.683   100
 ```
 
 ## tdigest Metrics
 
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
-| C            |        3 | 0.27 | 337 | 0.77 |          45 | 0.42 |       26 | 0.15 |
-| R            |        6 | 0.55 |  60 | 0.14 |          18 | 0.17 |       77 | 0.43 |
-| Rmd          |        1 | 0.09 |  28 | 0.06 |          33 | 0.31 |       48 | 0.27 |
-| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.09 |       28 | 0.16 |
+| C            |        3 | 0.27 | 337 | 0.68 |          45 | 0.38 |       26 | 0.11 |
+| R            |        6 | 0.55 | 118 | 0.24 |          25 | 0.21 |      133 | 0.56 |
+| Rmd          |        1 | 0.09 |  32 | 0.06 |          37 | 0.32 |       51 | 0.21 |
+| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.09 |       28 | 0.12 |
 
 ## Code of Conduct
 

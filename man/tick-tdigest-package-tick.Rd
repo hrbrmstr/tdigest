@@ -22,6 +22,9 @@ magnitude more accurate than those produced by previous digest algorithms.
 \item BugReports: \url{https://gitlab.com/hrbrmstr/tdigest/issues}
 }
 }
+\references{
+\url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
+}
 \author{
 Bob Rudis (bob@rud.is)
 }

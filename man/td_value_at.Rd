@@ -14,3 +14,11 @@ td_value_at(td, q)
 \description{
 Return the value at the specified quantile
 }
+\examples{
+td <- td_create(10)
+
+td_add(td, 0, 1) \%>\%
+  td_add(10, 1)
+
+td_value_at(td, 0.1)
+}
