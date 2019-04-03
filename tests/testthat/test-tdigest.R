@@ -41,10 +41,10 @@ expect_false(is_tdigest(x))
 expect_equal(td_total_count(td), 1000000)
 
 expect_identical(
-  as.integer(
+  ceiling(
     tquantile(td, c(0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1))
   ),
-  c(0L, 0L, 9L, 19L, 29L, 39L, 50L, 60L, 70L, 80L, 90L, 99L, 100L)
+  c(0, 1, 10, 20, 30, 40, 51, 61, 71, 81, 91, 100, 100)
 )
 
 expect_identical(
