@@ -9,6 +9,7 @@ options(width=120)
 ```
 
 [![Travis-CI Build Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest) 
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?branch=master&svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest) 
 [![Coverage Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/hrbrmstr/tdigest)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
 
@@ -26,26 +27,14 @@ See [the original paper by Ted Dunning](https://raw.githubusercontent.com/tdunni
 
 The following functions are implemented:
 
-- `is_tdigest`: Test to see if an object is classed as `tdigest`
-- `tdigest`:	Create a new t-digest histogram from a vector
-- `td_add`:	Add a value to the t-digest with the specified count
-- `td_create`:	Allocate a new histogram
-- `td_merge`:	Merge one t-digest into another
-- `td_quantile_of`:	Return the quantile of the value
-- `td_total_count`:	Total items contained in the t-digest
-- `td_value_at`:	Return the value at the specified quantile
-- `tquantile`:	Calcuate sample quantiles from a t-digest
+```{r ingredients, results='asis', echo=FALSE, cache=FALSE}
+hrbrpkghelpr::describe_ingredients()
+```
 
 ## Installation
 
-```{r install-ex, eval=FALSE}
-install.packages("tdigest", repos="https://cinc.rud.is/")
-# or 
-devtools::install_git("https://sr.ht.com/~hrbrmstr/tdigest.git")
-# or
-devtools::install_gitlab("hrbrmstr/tdigest")
-# or (if you must)
-devtools::install_github("hrbrmstr/tdigest")
+```{r install-ex, results='asis', echo = FALSE}
+hrbrpkghelpr::install_block()
 ```
 
 ## Usage

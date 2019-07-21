@@ -31,25 +31,28 @@ for more details on t-Digests.
 
 The following functions are implemented:
 
-  - `is_tdigest`: Test to see if an object is classed as `tdigest`
-  - `tdigest`: Create a new t-digest histogram from a vector
+  - `print.tdigest`: Printer for t-idgest objects
   - `td_add`: Add a value to the t-digest with the specified count
   - `td_create`: Allocate a new histogram
   - `td_merge`: Merge one t-digest into another
   - `td_quantile_of`: Return the quantile of the value
   - `td_total_count`: Total items contained in the t-digest
   - `td_value_at`: Return the value at the specified quantile
+  - `'tdigest-package'`: Wicked Fast, Accurate Quantiles Using
+    ‘t-Digests’
   - `tquantile`: Calcuate sample quantiles from a t-digest
 
 ## Installation
 
 ``` r
-install.packages("tdigest", repos="https://cinc.rud.is/")
-# or 
-devtools::install_git("https://sr.ht.com/~hrbrmstr/tdigest.git")
+install.packages("tdigest", repos = "https://cinc.rud.is")
+# or
+devtools::install_git("https://git.rud.is/hrbrmstr/tdigest.git")
+# or
+devtools::install_git("https://git.sr.ht/~hrbrmstr/tdigest")
 # or
 devtools::install_gitlab("hrbrmstr/tdigest")
-# or (if you must)
+# or
 devtools::install_github("hrbrmstr/tdigest")
 ```
 
@@ -111,11 +114,11 @@ td_total_count(td)
 ## [1] 1e+06
 
 tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
-##  [1]   0.0000000   0.8632378   9.6763281  19.7028368  29.7718982  39.9706864  50.0032181  60.0859360  70.1951621
-## [10]  80.2785864  90.3290326  99.5151872 100.0000000
+##  [1]   0.0000000   0.8099857   9.6725790  19.7533723  29.7448283  39.7544675  49.9966628  60.0235148  70.2067574
+## [10]  80.3090454  90.2594642  99.4269454 100.0000000
 
 quantile(td)
-## [1]   0.00000  24.81839  50.00322  75.23076 100.00000
+## [1]   0.00000  24.74751  49.99666  75.24783 100.00000
 ```
 
 #### Proof it’s faster
@@ -126,9 +129,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean     median         uq       max neval
-##     tdigest    26.334    31.162    61.02889    67.3605    71.0985   177.618   100
-##  r_quantile 61909.704 64146.167 66500.42677 65329.2830 68093.9355 78102.683   100
+##        expr       min        lq        mean     median         uq       max neval cld
+##     tdigest     9.101    10.359    22.61334    12.2885    32.5395   102.195   100  a 
+##  r_quantile 52272.444 52996.613 55220.78317 53415.9430 56315.1960 96316.699   100   b
 ```
 
 ## tdigest Metrics
@@ -136,8 +139,8 @@ microbenchmark::microbenchmark(
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
 | C            |        3 | 0.27 | 337 | 0.68 |          45 | 0.38 |       26 | 0.11 |
-| R            |        6 | 0.55 | 118 | 0.24 |          25 | 0.21 |      133 | 0.56 |
-| Rmd          |        1 | 0.09 |  32 | 0.06 |          37 | 0.32 |       51 | 0.21 |
+| R            |        6 | 0.55 | 120 | 0.24 |          25 | 0.21 |      133 | 0.58 |
+| Rmd          |        1 | 0.09 |  30 | 0.06 |          37 | 0.32 |       41 | 0.18 |
 | C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.09 |       28 | 0.12 |
 
 ## Code of Conduct
