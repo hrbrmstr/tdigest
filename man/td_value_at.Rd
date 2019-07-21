@@ -2,14 +2,23 @@
 % Please edit documentation in R/create.R
 \name{td_value_at}
 \alias{td_value_at}
+\alias{[.tdigest}
 \title{Return the value at the specified quantile}
 \usage{
 td_value_at(td, q)
+
+\method{[}{tdigest}(x, i, ...)
 }
 \arguments{
 \item{td}{t-digest object}
 
 \item{q}{quantile (range 0:1)}
+
+\item{x}{a tdigest object}
+
+\item{i}{quantile (range 0:1)}
+
+\item{...}{unused}
 }
 \description{
 Return the value at the specified quantile
@@ -21,4 +30,7 @@ td_add(td, 0, 1) \%>\%
   td_add(10, 1)
 
 td_value_at(td, 0.1)
+td_value_at(td, 0.5)
+td[0.1]
+td[0.5]
 }

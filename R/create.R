@@ -109,6 +109,7 @@ td_create <- function(compression=100) {
 #' td <- td_create(10)
 #' td_add(td, 0, 1)
 #' td_total_count(td)
+#' length(td)
 td_total_count <- function(td) {
   stopifnot(inherits(td, "tdigest"))
   stopifnot(!is_null_xptr(td))
@@ -144,6 +145,9 @@ td_add <- function(td, val, count) {
 #'   td_add(10, 1)
 #'
 #' td_value_at(td, 0.1)
+#' td_value_at(td, 0.5)
+#' td[0.1]
+#' td[0.5]
 td_value_at <- function(td, q) {
   stopifnot(inherits(td, "tdigest"))
   stopifnot(!is_null_xptr(td))
@@ -175,4 +179,24 @@ td_merge <- function(from, into) {
   stopifnot(!is_null_xptr(from))
   stopifnot(!is_null_xptr(into))
   .Call("Rtd_merge", from=from, into=into, PACKAGE="tdigest")
+}
+
+
+#' @rdname td_total_count
+#' @param x a tdigest object
+#' @export
+length.tdigest <- function(x) {
+  td_total_count(x)
+}
+
+#' @rdname td_value_at
+#' @param x a tdigest object
+#' @param i quantile (range 0:1)
+#' @param ... unused
+#' @export
+`[.tdigest` <- function(x, i, ...) {
+  if (length(x) == 0) return(NULL)
+  i <- as.double(i[1])
+  if ((i<=0) || (i>1)) return(NULL)
+  td_value_at(x, i)
 }

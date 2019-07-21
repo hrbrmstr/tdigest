@@ -2,12 +2,17 @@
 % Please edit documentation in R/create.R
 \name{td_total_count}
 \alias{td_total_count}
+\alias{length.tdigest}
 \title{Total items contained in the t-digest}
 \usage{
 td_total_count(td)
+
+\method{length}{tdigest}(x)
 }
 \arguments{
 \item{td}{t-digest object}
+
+\item{x}{a tdigest object}
 }
 \description{
 Total items contained in the t-digest
@@ -16,4 +21,5 @@ Total items contained in the t-digest
 td <- td_create(10)
 td_add(td, 0, 1)
 td_total_count(td)
+length(td)
 }
