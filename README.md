@@ -39,7 +39,7 @@ The following functions are implemented:
   - `td_quantile_of`: Return the quantile of the value
   - `td_total_count`: Total items contained in the t-digest
   - `td_value_at`: Return the value at the specified quantile
-  - `tquantile`: Calcuate sample quantiles from a t-digest
+  - `tquantile`: Calculate sample quantiles from a t-digest
 
 ## Installation
 
@@ -64,7 +64,7 @@ library(tdigest)
 
 # current version
 packageVersion("tdigest")
-## [1] '0.2.0'
+## [1] '0.3.0'
 ```
 
 ### Basic (Low-level interface)
@@ -146,21 +146,21 @@ microbenchmark::microbenchmark(
 )
 ## Unit: microseconds
 ##        expr       min         lq        mean    median         uq       max neval cld
-##     tdigest     8.227     9.4895    21.66915    12.509    33.6245    69.111   100  a 
-##  r_quantile 53792.878 54695.9560 56684.11386 55361.924 57719.2745 99458.184   100   b
+##     tdigest     7.943     9.4015    20.94626    11.957    32.9395    48.487   100  a 
+##  r_quantile 52305.639 53309.4185 55386.25517 54038.227 56644.9055 94300.294   100   b
 ```
 
 ## tdigest Metrics
 
-| Lang         | \# Files | (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
-| :----------- | -------: | --: | --: | ---: | ----------: | ---: | -------: | ---: |
-| C            |        3 | 0.3 | 347 | 0.66 |          45 | 0.36 |       26 | 0.11 |
-| R            |        5 | 0.5 | 136 | 0.26 |          31 | 0.25 |      135 | 0.58 |
-| Rmd          |        1 | 0.1 |  36 | 0.07 |          40 | 0.32 |       45 | 0.19 |
-| C/C++ Header |        1 | 0.1 |  10 | 0.02 |          10 | 0.08 |       28 | 0.12 |
+| Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
+| :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
+| C            |        3 | 0.27 | 350 | 0.65 |          46 | 0.36 |       26 | 0.11 |
+| R            |        6 | 0.55 | 139 | 0.26 |          31 | 0.24 |      135 | 0.58 |
+| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       45 | 0.19 |
+| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.08 |       28 | 0.12 |
 
 ## Code of Conduct
 
-Please note that this project is released with a [Contributor Code of
-Conduct](CONDUCT.md). By participating in this project you agree to
-abide by its terms.
+Please note that this project is released with a Contributor Code of
+Conduct. By participating in this project you agree to abide by its
+terms.

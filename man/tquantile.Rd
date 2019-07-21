@@ -3,7 +3,7 @@
 \name{tquantile}
 \alias{tquantile}
 \alias{quantile.tdigest}
-\title{Calcuate sample quantiles from a t-digest}
+\title{Calculate sample quantiles from a t-digest}
 \usage{
 tquantile(td, probs)
 
@@ -22,7 +22,7 @@ tquantile(td, probs)
 a numeric vector
 }
 \description{
-Calcuate sample quantiles from a t-digest
+Calculate sample quantiles from a t-digest
 }
 \examples{
 set.seed(1492)

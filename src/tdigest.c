@@ -30,7 +30,7 @@ struct td_histogram {
      double merged_count;
      double unmerged_count;
 
-     node_t nodes[0];
+     node_t nodes[];
 };
 
 static bool is_very_small(double val) {

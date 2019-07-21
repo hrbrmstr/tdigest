@@ -11,9 +11,17 @@
 
 * This is a new release.
 
+- README warning fixed.
+- Zero sized array warning fixed
+
 Hey CRAN team members! There is no rush 
 to get this processed whatsoever so if 
 there are package authors who have 
 asked for any acceleration of their 
 package evaluation please do not hesitate
 to put them ahead of this in the queue.
+
+It's passed more than a few gauntlets
+(that bullet list at the top is legit) but
+if I missed anything I apologize in advance
+and will work to correct ASAP.

@@ -37,7 +37,7 @@ tdigest <- function(vec, compression=100) {
   .Call("Rtdig", vec=vec, compression=compression)
 }
 
-#' Calcuate sample quantiles from a t-digest
+#' Calculate sample quantiles from a t-digest
 #'
 #' @param td t-digest object
 #' @param probs numeric vector of probabilities with values in range 0:1

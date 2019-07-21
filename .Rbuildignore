@@ -3,8 +3,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
-^README\.*Rmd$
-^README\.*html$
+^README.*$
 ^CONDUCT\.md$
 ^NOTES\.*Rmd$
 ^NOTES\.*html$
@@ -17,3 +16,4 @@
 ^\.gitlab-ci\.yml$
 ^appveyor\.yml$
 ^cran-comments\.md$
+^CRAN-RELEASE$
