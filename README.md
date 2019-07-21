@@ -52,6 +52,8 @@ devtools::install_git("https://git.sr.ht/~hrbrmstr/tdigest")
 # or
 devtools::install_gitlab("hrbrmstr/tdigest")
 # or
+devtools::install_bitbucket("hrbrmstr/tdigest")
+# or
 devtools::install_github("hrbrmstr/tdigest")
 ```
 
@@ -128,9 +130,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean     median        uq       max neval cld
-##     tdigest     9.021    10.365    21.59718    12.2975    33.735    58.149   100  a 
-##  r_quantile 52126.043 53085.762 55141.69259 53902.7415 55988.804 98140.384   100   b
+##        expr       min         lq        mean   median         uq        max neval cld
+##     tdigest     8.994    10.5205    20.97971    12.20    33.1645     37.448   100  a 
+##  r_quantile 52181.822 53123.4685 55258.30131 53593.93 56231.9310 104215.008   100   b
 ```
 
 ## tdigest Metrics
