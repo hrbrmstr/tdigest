@@ -5,12 +5,16 @@
 
 #include "tdigest.h"
 
-#define M_PI 3.14159265358979323846
+#define MM_PI 3.14159265358979323846
 
 typedef struct node {
      double mean;
      double count;
 } node_t;
+
+void bbzero(void *to, size_t count) {
+  memset(to, 0, count);
+}
 
 struct td_histogram {
      // compression is a setting used to configure the size of centroids when merged.
@@ -69,7 +73,7 @@ static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
      if (!h) {
           return NULL;
      }
-     bzero((void *)(h), buf_size);
+     bbzero((void *)(h), buf_size);
      *h = (td_histogram_t) {
           .compression = compression,
           .cap = (buf_size - sizeof(td_histogram_t)) / sizeof(node_t),
@@ -219,7 +223,7 @@ static void merge(td_histogram_t *h) {
      int N = h->merged_nodes + h->unmerged_nodes;
      qsort((void *)(h->nodes), N, sizeof(node_t), &compare_nodes);
      double total_count = h->merged_count + h->unmerged_count;
-     double denom = 2 * M_PI * total_count * log(total_count);
+     double denom = 2 * MM_PI * total_count * log(total_count);
      double normalizer = h->compression / denom;
      int cur = 0;
      double count_so_far = 0;

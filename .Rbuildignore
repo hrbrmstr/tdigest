@@ -16,3 +16,4 @@
 ^notes$
 ^\.gitlab-ci\.yml$
 ^appveyor\.yml$
+^cran-comments\.md$
