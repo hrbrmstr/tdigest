@@ -1,6 +1,8 @@
 
 [![Travis-CI Build
 Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?branch=master&svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest)
 [![Coverage
 Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/hrbrmstr/tdigest)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
@@ -129,9 +131,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean     median         uq       max neval cld
-##     tdigest     9.101    10.359    22.61334    12.2885    32.5395   102.195   100  a 
-##  r_quantile 52272.444 52996.613 55220.78317 53415.9430 56315.1960 96316.699   100   b
+##        expr       min         lq        mean    median         uq       max neval cld
+##     tdigest     8.909    10.5495    21.83006    13.177    33.2735    48.691   100  a 
+##  r_quantile 52577.111 53100.9245 55607.80183 53849.957 56278.1755 96026.512   100   b
 ```
 
 ## tdigest Metrics
@@ -140,7 +142,7 @@ microbenchmark::microbenchmark(
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
 | C            |        3 | 0.27 | 337 | 0.68 |          45 | 0.38 |       26 | 0.11 |
 | R            |        6 | 0.55 | 120 | 0.24 |          25 | 0.21 |      133 | 0.58 |
-| Rmd          |        1 | 0.09 |  30 | 0.06 |          37 | 0.32 |       41 | 0.18 |
+| Rmd          |        1 | 0.09 |  30 | 0.06 |          37 | 0.32 |       42 | 0.18 |
 | C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.09 |       28 | 0.12 |
 
 ## Code of Conduct
