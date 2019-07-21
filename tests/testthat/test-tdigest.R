@@ -53,3 +53,13 @@ expect_equal(
   c(0, 25, 51, 76, 100),
   tolerance = 3
 )
+
+context("ALTREP test")
+
+N <- 1000000
+x.altrep <- seq_len(N) # this is an ALTREP in R version >= 3.5.0
+
+td <- tdigest(x.altrep)
+expect_equal(as.integer(td[0.1]), 93051)
+expect_equal(as.integer(td[0.5]), 491472)
+expect_equal(length(td), 1000000)

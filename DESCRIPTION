@@ -1,7 +1,7 @@
 Package: tdigest
 Type: Package
 Title: Wicked Fast, Accurate Quantiles Using 't-Digests'
-Version: 0.2.0
+Version: 0.3.0
 Date: 2019-07-21
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
@@ -31,7 +31,7 @@ Suggests:
     testthat,
     covr
 Depends:
-    R (>= 3.2.0)
+    R (>= 3.5.0)
 Imports: 
     magrittr,
     stats

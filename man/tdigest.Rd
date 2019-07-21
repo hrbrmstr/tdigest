@@ -10,7 +10,9 @@ tdigest(vec, compression = 100)
 \method{print}{tdigest}(x, ...)
 }
 \arguments{
-\item{vec}{vector (will be converted to \code{double} if not already double)}
+\item{vec}{vector (will be converted to \code{double} if not already double). NOTE that this
+is ALTREP-aware and will not materialize the passed-in object in order to
+add the values to the t-Digest.}
 
 \item{compression}{the input compression value; should be >= 1.0; this
 will control how aggressively the TDigest compresses data together.

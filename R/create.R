@@ -11,7 +11,9 @@
 #' The accuracy of quantile estimates produced by t-digests can be orders of
 #' magnitude more accurate than those produced by previous digest algorithms.
 #'
-#' @param vec vector (will be converted to `double` if not already double)
+#' @param vec vector (will be converted to `double` if not already double). NOTE that this
+#'        is ALTREP-aware and will not materialize the passed-in object in order to
+#'        add the values to the t-Digest.
 #' @param compression the input compression value; should be >= 1.0; this
 #'        will control how aggressively the TDigest compresses data together.
 #'        The original t-Digest paper suggests using a value of 100 for a good
@@ -129,6 +131,7 @@ td_add <- function(td, val, count) {
   stopifnot(inherits(td, "tdigest"))
   stopifnot(!is_null_xptr(td))
   val <- as.double(val[1])
+  stopifnot(!is.na(val))
   count <- as.double(count[1])
   .Call("Rtd_add", tdig=td, val=val, count=count, PACKAGE="tdigest")
 }

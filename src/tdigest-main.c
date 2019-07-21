@@ -1,6 +1,8 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#include <R_ext/Altrep.h>
+#include <R_ext/Itermacros.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -45,9 +47,17 @@ SEXP Rtdig(SEXP vec, SEXP compression) {
   SEXP ptr;
   td_histogram_t *t = td_new(asReal(compression));
   if (t) {
-    R_xlen_t n = xlength(vec);
-    for (R_xlen_t i = 0; i < n; i++) {
-      td_add(t, REAL(vec)[i], 1);
+    R_xlen_t n = Rf_xlength(vec);
+    if (ALTREP(vec)) {
+      ITERATE_BY_REGION(vec, x, i, nbatch, double, REAL, {
+        for (R_xlen_t k = 0; k < nbatch; k++) {
+          if (!ISNAN(x[k])) td_add(t, x[k], 1);
+        }
+      });
+    } else {
+      for (R_xlen_t i = 0; i < n; i++) {
+        if (!ISNAN(REAL(vec)[i])) td_add(t, REAL(vec)[i], 1);
+      }
     }
     ptr = R_MakeExternalPtr(t, install("tdigest"), R_NilValue);
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);

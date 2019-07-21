@@ -88,6 +88,18 @@ tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 quantile(td)
 ```
 
+#### ALTREP-aware
+
+```{r}
+N <- 1000000
+x.altrep <- seq_len(N) # this is an ALTREP in R version >= 3.5.0
+
+td <- tdigest(x.altrep)
+td[0.1]
+td[0.5]
+length(td)
+```
+
 #### Proof it's faster
 
 ```{r}
