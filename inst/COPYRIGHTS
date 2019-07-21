@@ -1,6 +1,6 @@
 The R code and src/tdigest-main.c, src/init.c are MIT-licensed by the package author.
 
-src/tdigest.h, src/tdigest.c is MIT-licensed & Copyright (c) 2018 ajwerner [REF: https://github.com/ajwerner/tdigestc]
+src/tdigest.h, src/tdigest.c are MIT-licensed & Copyright (c) 2018 ajwerner [REF: https://github.com/ajwerner/tdigestc; license below copied from that repository]
 
 The original t-Digest implementation and algorithm are  have the following license:
 

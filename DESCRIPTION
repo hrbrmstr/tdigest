@@ -2,7 +2,7 @@ Package: tdigest
 Type: Package
 Title: Wicked Fast, Accurate Quantiles Using 't-Digests'
 Version: 0.2.0
-Date: 2019-04-03
+Date: 2019-07-21
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0001-5670-2640")),

@@ -2,9 +2,12 @@
 % Please edit documentation in R/create.R
 \name{tdigest}
 \alias{tdigest}
+\alias{print.tdigest}
 \title{Create a new t-digest histogram from a vector}
 \usage{
 tdigest(vec, compression = 100)
+
+\method{print}{tdigest}(x, ...)
 }
 \arguments{
 \item{vec}{vector (will be converted to \code{double} if not already double)}
@@ -16,12 +19,25 @@ balance between precision and efficiency. It will land at very small
 (think like 1e-6 percentile points) errors at extreme points in the
 distribution, and compression ratios of around 500 for large data sets
 (~1 million datapoints). Defaults to 100.}
+
+\item{x}{t-tigest object}
+
+\item{...}{unused}
 }
 \value{
 a tdigest object
 }
 \description{
-Create a new t-digest histogram from a vector
+The t-digest construction algorithm uses a variant of 1-dimensional
+k-means clustering to produce a very compact data structure that allows
+accurate estimation of quantiles. This t-digest data structure can be used
+to estimate quantiles, compute other rank statistics or even to estimate
+related measures like trimmed means. The advantage of the t-digest over
+previous digests for this purpose is that the t-digest handles data with
+full floating point resolution. With small changes, the t-digest can handle
+values from any ordered set for which we can compute something akin to a mean.
+The accuracy of quantile estimates produced by t-digests can be orders of
+magnitude more accurate than those produced by previous digest algorithms.
 }
 \examples{
 set.seed(1492)
@@ -33,3 +49,4 @@ quantile(td)
 \references{
 \url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
 }
+\keyword{internal}
