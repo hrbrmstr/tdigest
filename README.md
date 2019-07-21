@@ -33,15 +33,12 @@ for more details on t-Digests.
 
 The following functions are implemented:
 
-  - `print.tdigest`: Printer for t-idgest objects
   - `td_add`: Add a value to the t-digest with the specified count
   - `td_create`: Allocate a new histogram
   - `td_merge`: Merge one t-digest into another
   - `td_quantile_of`: Return the quantile of the value
   - `td_total_count`: Total items contained in the t-digest
   - `td_value_at`: Return the value at the specified quantile
-  - `'tdigest-package'`: Wicked Fast, Accurate Quantiles Using
-    ‘t-Digests’
   - `tquantile`: Calcuate sample quantiles from a t-digest
 
 ## Installation
@@ -131,19 +128,19 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min         lq        mean    median         uq       max neval cld
-##     tdigest     8.909    10.5495    21.83006    13.177    33.2735    48.691   100  a 
-##  r_quantile 52577.111 53100.9245 55607.80183 53849.957 56278.1755 96026.512   100   b
+##        expr       min        lq        mean     median        uq       max neval cld
+##     tdigest     9.021    10.365    21.59718    12.2975    33.735    58.149   100  a 
+##  r_quantile 52126.043 53085.762 55141.69259 53902.7415 55988.804 98140.384   100   b
 ```
 
 ## tdigest Metrics
 
-| Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
-| :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
-| C            |        3 | 0.27 | 337 | 0.68 |          45 | 0.38 |       26 | 0.11 |
-| R            |        6 | 0.55 | 120 | 0.24 |          25 | 0.21 |      133 | 0.58 |
-| Rmd          |        1 | 0.09 |  30 | 0.06 |          37 | 0.32 |       42 | 0.18 |
-| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.09 |       28 | 0.12 |
+| Lang         | \# Files | (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
+| :----------- | -------: | --: | --: | ---: | ----------: | ---: | -------: | ---: |
+| C            |        3 | 0.3 | 337 | 0.67 |          45 | 0.38 |       26 | 0.11 |
+| R            |        5 | 0.5 | 128 | 0.25 |          28 | 0.23 |      133 | 0.58 |
+| Rmd          |        1 | 0.1 |  30 | 0.06 |          37 | 0.31 |       42 | 0.18 |
+| C/C++ Header |        1 | 0.1 |  10 | 0.02 |          10 | 0.08 |       28 | 0.12 |
 
 ## Code of Conduct
 
