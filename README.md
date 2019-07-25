@@ -5,7 +5,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 [![Signed
 by](https://img.shields.io/badge/Keybase-Verified-brightgreen.svg)](https://keybase.io/hrbrmstr)
 ![Signed commit
-%](https://img.shields.io/badge/Signed_Commits-95.7%25-lightgrey.svg)
+%](https://img.shields.io/badge/Signed_Commits-100%25-lightgrey.svg)
 [![Linux build
 Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest)
 [![Windows build
@@ -156,9 +156,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean     median        uq        max neval
-##     tdigest     5.324     6.712    19.18354    12.0475    26.941     84.919   100
-##  r_quantile 61442.143 64031.655 68172.17037 66155.0690 70321.910 132065.801   100
+##        expr       min        lq        mean   median       uq        max neval
+##     tdigest     5.321     7.033    19.31994    12.81    27.21     78.235   100
+##  r_quantile 63712.810 66272.069 69917.07935 67808.48 70713.83 136526.086   100
 ```
 
 ## tdigest Metrics
