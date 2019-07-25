@@ -1,11 +1,20 @@
 
-[![Travis-CI Build
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Signed
+by](https://img.shields.io/badge/Keybase-Verified-brightgreen.svg)](https://keybase.io/hrbrmstr)
+![Signed commit
+%](https://img.shields.io/badge/Signed_Commits-95.7%25-lightgrey.svg)
+[![Linux build
 Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?branch=master&svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest)
+[![Windows build
+status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest)
 [![Coverage
 Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/hrbrmstr/tdigest)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
+![Minimal R
+Version](https://img.shields.io/badge/R%3E%3D-3.5.0-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 # tdigest
 
@@ -13,49 +22,51 @@ Wicked Fast, Accurate Quantiles Using ‘t-Digests’
 
 ## Description
 
-The t-digest construction algorithm uses a variant of 1-dimensional
+The t-Digest construction algorithm uses a variant of 1-dimensional
 k-means clustering to produce a very compact data structure that allows
-accurate estimation of quantiles. This t-digest data structure can be
+accurate estimation of quantiles. This t-Digest data structure can be
 used to estimate quantiles, compute other rank statistics or even to
 estimate related measures like trimmed means. The advantage of the
-t-digest over previous digests for this purpose is that the t-digest
-handles data with full floating point resolution. With small changes,
-the t-digest can handle values from any ordered set for which we can
-compute something akin to a mean. The accuracy of quantile estimates
-produced by t-digests can be orders of magnitude more accurate than
-those produced by previous digest algorithms.
+t-Digest over previous digests for this purpose is that the t-Digest
+handles data with full floating point resolution. The accuracy of
+quantile estimates produced by t-Digests can be orders of magnitude more
+accurate than those produced by previous digest algorithms. Methods are
+provided to create and update t-Digests and retreive quantiles from the
+accumulated distributions.
 
-See [the original paper by Ted
-Dunning](https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf)
-for more details on t-Digests.
+See [the original paper by Ted Dunning & Otmar
+Ertl](https://arxiv.org/abs/1902.04023) for more details on t-Digests.
 
 ## What’s Inside The Tin
 
 The following functions are implemented:
 
-  - `td_add`: Add a value to the t-digest with the specified count
+  - `td_add`: Add a value to the t-Digest with the specified count
   - `td_create`: Allocate a new histogram
-  - `td_merge`: Merge one t-digest into another
+  - `td_merge`: Merge one t-Digest into another
   - `td_quantile_of`: Return the quantile of the value
-  - `td_total_count`: Total items contained in the t-digest
+  - `td_total_count`: Total items contained in the t-Digest
   - `td_value_at`: Return the value at the specified quantile
-  - `tquantile`: Calculate sample quantiles from a t-digest
+  - `tquantile`: Calculate sample quantiles from a t-Digest
 
 ## Installation
 
 ``` r
 install.packages("tdigest", repos = "https://cinc.rud.is")
 # or
-devtools::install_git("https://git.rud.is/hrbrmstr/tdigest.git")
+remotes::install_git("https://git.rud.is/hrbrmstr/tdigest.git")
 # or
-devtools::install_git("https://git.sr.ht/~hrbrmstr/tdigest")
+remotes::install_git("https://git.sr.ht/~hrbrmstr/tdigest")
 # or
-devtools::install_gitlab("hrbrmstr/tdigest")
+remotes::install_gitlab("hrbrmstr/tdigest")
 # or
-devtools::install_bitbucket("hrbrmstr/tdigest")
+remotes::install_bitbucket("hrbrmstr/tdigest")
 # or
-devtools::install_github("hrbrmstr/tdigest")
+remotes::install_github("hrbrmstr/tdigest")
 ```
+
+NOTE: To use the ‘remotes’ install options you will need to have the
+[{remotes} package](https://github.com/r-lib/remotes) installed.
 
 ## Usage
 
@@ -145,9 +156,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min         lq        mean    median         uq       max neval cld
-##     tdigest     7.943     9.4015    20.94626    11.957    32.9395    48.487   100  a 
-##  r_quantile 52305.639 53309.4185 55386.25517 54038.227 56644.9055 94300.294   100   b
+##        expr       min        lq        mean     median        uq        max neval
+##     tdigest     5.324     6.712    19.18354    12.0475    26.941     84.919   100
+##  r_quantile 61442.143 64031.655 68172.17037 66155.0690 70321.910 132065.801   100
 ```
 
 ## tdigest Metrics
@@ -155,9 +166,9 @@ microbenchmark::microbenchmark(
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
 | C            |        3 | 0.27 | 350 | 0.65 |          46 | 0.36 |       26 | 0.11 |
-| R            |        6 | 0.55 | 139 | 0.26 |          31 | 0.24 |      135 | 0.58 |
-| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       45 | 0.19 |
-| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.08 |       28 | 0.12 |
+| R            |        6 | 0.55 | 140 | 0.26 |          31 | 0.24 |      139 | 0.57 |
+| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       52 | 0.21 |
+| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.08 |       26 | 0.11 |
 
 ## Code of Conduct
 

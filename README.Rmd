@@ -4,14 +4,12 @@ editor_options:
   chunk_output_type: console
 ---
 ```{r pkg-knitr-opts, include=FALSE}
-knitr::opts_chunk$set(collapse=TRUE, fig.retina=2, message=FALSE, warning=FALSE)
-options(width=120)
+hrbrpkghelpr::global_opts()
 ```
 
-[![Travis-CI Build Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest) 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?branch=master&svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest) 
-[![Coverage Status](https://codecov.io/gh/hrbrmstr/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/hrbrmstr/tdigest)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/tdigest)](https://cran.r-project.org/package=tdigest)
+```{r badges, results='asis', echo=FALSE, cache=FALSE}
+hrbrpkghelpr::stinking_badges()
+```
 
 # tdigest
 
