@@ -11,7 +11,7 @@ is_tdigest(td)
 }
 \arguments{
 \item{compression}{the input compression value; should be >= 1.0; this
-will control how aggressively the TDigest compresses data together.
+will control how aggressively the t-Digest compresses data together.
 The original t-Digest paper suggests using a value of 100 for a good
 balance between precision and efficiency. It will land at very small
 (think like 1e-6 percentile points) errors at extreme points in the
@@ -21,7 +21,7 @@ distribution, and compression ratios of around 500 for large data sets
 \item{td}{t-digest object}
 }
 \value{
-a tdigest object
+a \code{tdigest} object
 }
 \description{
 Allocate a new histogram
@@ -30,5 +30,5 @@ Allocate a new histogram
 td <- td_create(10)
 }
 \references{
-\url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
+\url{https://raw.githubusercontent.com/tdunning/t-Digest/master/docs/t-Digest-paper/histo.pdf}
 }

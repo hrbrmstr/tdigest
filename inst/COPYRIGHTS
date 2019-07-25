@@ -1,8 +1,15 @@
-The R code and src/tdigest-main.c, src/init.c are MIT-licensed by the package author.
+The R code and src/tdigest-main.c, src/init.c are MIT-licensed
+by the package author.
 
-src/tdigest.h, src/tdigest.c are MIT-licensed & Copyright (c) 2018 ajwerner [REF: https://github.com/ajwerner/tdigestc; license below copied from that repository]
+src/tdigest.h, src/tdigest.c are MIT-licensed & Copyright (c) 2018
+Andrew Werner [REF: https://github.com/ajwerner/tdigestc; license below
+copied from that repository]
 
-The original t-Digest implementation and algorithm are  have the following license:
+The t-Digest original algorithm and Java implementation
+(which is the base of Andrew Werner's re-implementation) is
+Copyright (c) 2015 Ted Dunning and uses the same Apache License2.0, below.
+
+------------
 
                                 Apache License
                            Version 2.0, January 2004

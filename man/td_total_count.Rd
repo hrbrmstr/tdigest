@@ -3,19 +3,22 @@
 \name{td_total_count}
 \alias{td_total_count}
 \alias{length.tdigest}
-\title{Total items contained in the t-digest}
+\title{Total items contained in the t-Digest}
 \usage{
 td_total_count(td)
 
 \method{length}{tdigest}(x)
 }
 \arguments{
-\item{td}{t-digest object}
+\item{td}{t-Digest object}
 
 \item{x}{a tdigest object}
 }
+\value{
+\code{double} containing the size of the t-Digest
+}
 \description{
-Total items contained in the t-digest
+Total items contained in the t-Digest
 }
 \examples{
 td <- td_create(10)

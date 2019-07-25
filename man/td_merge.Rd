@@ -2,18 +2,18 @@
 % Please edit documentation in R/create.R
 \name{td_merge}
 \alias{td_merge}
-\title{Merge one t-digest into another}
+\title{Merge one t-Digest into another}
 \usage{
 td_merge(from, into)
 }
 \arguments{
-\item{from, into}{t-digests}
+\item{from, into}{t-Digests}
 }
 \value{
 \code{into}
 
-a tdigest object
+a \code{tdigest} object
 }
 \description{
-Merge one t-digest into another
+Merge one t-Digest into another
 }

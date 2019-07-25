@@ -3,14 +3,14 @@
 \name{tquantile}
 \alias{tquantile}
 \alias{quantile.tdigest}
-\title{Calculate sample quantiles from a t-digest}
+\title{Calculate sample quantiles from a t-Digest}
 \usage{
 tquantile(td, probs)
 
 \method{quantile}{tdigest}(x, probs = seq(0, 1, 0.25), ...)
 }
 \arguments{
-\item{td}{t-digest object}
+\item{td}{t-Digest object}
 
 \item{probs}{numeric vector of probabilities with values in range 0:1}
 
@@ -19,10 +19,10 @@ tquantile(td, probs)
 \item{...}{unused}
 }
 \value{
-a numeric vector
+a \code{numeric} vector containing the requested quantile values
 }
 \description{
-Calculate sample quantiles from a t-digest
+Calculate sample quantiles from a t-Digest
 }
 \examples{
 set.seed(1492)
@@ -32,5 +32,5 @@ tquantile(td, c(0, .01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 quantile(td)
 }
 \references{
-\url{https://raw.githubusercontent.com/tdunning/t-digest/master/docs/t-digest-paper/histo.pdf}
+\url{https://raw.githubusercontent.com/tdunning/t-Digest/master/docs/t-Digest-paper/histo.pdf}
 }

@@ -10,7 +10,7 @@ td_value_at(td, q)
 \method{[}{tdigest}(x, i, ...)
 }
 \arguments{
-\item{td}{t-digest object}
+\item{td}{t-Digest object}
 
 \item{q}{quantile (range 0:1)}
 
@@ -19,6 +19,9 @@ td_value_at(td, q)
 \item{i}{quantile (range 0:1)}
 
 \item{...}{unused}
+}
+\value{
+the computed quantile (\code{double})
 }
 \description{
 Return the value at the specified quantile

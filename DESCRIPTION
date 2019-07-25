@@ -1,27 +1,27 @@
 Package: tdigest
 Type: Package
-Title: Wicked Fast, Accurate Quantiles Using 't-Digests'
+Title: Wicked Fast, Accurate Quantiles Using t-Digests
 Version: 0.3.0
-Date: 2019-07-21
+Date: 2019-07-25
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0001-5670-2640")),
     person("Ted", "Dunning", role = "aut",
            comment = "t-Digest algorithm; <https://github.com/tdunning/t-digest/>"),
-    person("ajwerner", "", role = "aut", 
+    person("Andrew", "Werner", role = "aut", 
            comment = "Original C+ code; <https://github.com/ajwerner/tdigest>")
   )
-Maintainer: Bob Rudis <bob@rud.is>
-Description: The 't-digest' construction algorithm uses a variant of 1-dimensional 
-    'k-means' clustering to produce a very compact data structure that allows 
-    accurate estimation of quantiles. This 't-digest' data structure can be used 
+Description: The t-Digest construction algorithm, by 
+    Dunning et al., (2019) <arXiv:1902.04023v1>, uses a variant of 1-dimensional 
+    k-means clustering to produce a very compact data structure that allows 
+    accurate estimation of quantiles. This t-Digest data structure can be used 
     to estimate quantiles, compute other rank statistics or even to estimate 
-    related measures like trimmed means. The advantage of the 't-digest' over 
-    previous digests for this purpose is that the 't-digest' handles data with 
-    full floating point resolution. With small changes, the 't-digest' can handle 
-    values from any ordered set for which we can compute something akin to a mean. 
-    The accuracy of quantile estimates produced by 't-digests' can be orders of 
-    magnitude more accurate than those produced by previous digest algorithms.
+    related measures like trimmed means. The advantage of the t-Digest over 
+    previous digests for this purpose is that the t-Digest handles data with 
+    full floating point resolution. The accuracy of quantile estimates produced 
+    by t-Digests can be orders of magnitude more accurate than those produced 
+    by previous digest algorithms. Methods are provided to create and update 
+    t-Digests and retrieve quantiles from the accumulated distributions.
 URL: https://gitlab.com/hrbrmstr/tdigest
 BugReports: https://gitlab.com/hrbrmstr/tdigest/issues
 Copyright: file inst/COPYRIGHTS

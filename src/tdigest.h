@@ -6,16 +6,14 @@
 // Copyright (c) 2018 Andrew Werner, All rights reserved.
 //
 // tdigest is an implementation of Ted Dunning's streaming quantile estimation
-// data structure. 
+// data structure.
 // This implementation is intended to be like the new MergingHistogram.
 // It focuses on being in portable C that should be easy to integrate into other
-// languages. In particular it provides mechanisms to preallocate all memory 
+// languages. In particular it provides mechanisms to preallocate all memory
 // at construction time.
 //
-// The implementation is a direct descendent of 
+// The implementation is a direct descendent of
 //  https://github.com/tdunning/t-digest/
-//
-// TODO: add a Ted Dunning Copyright notice.
 //
 ////////////////////////////////////////////////////////////////////////////////
 

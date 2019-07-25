@@ -2,19 +2,22 @@
 % Please edit documentation in R/create.R
 \name{td_add}
 \alias{td_add}
-\title{Add a value to the t-digest with the specified count}
+\title{Add a value to the t-Digest with the specified count}
 \usage{
 td_add(td, val, count)
 }
 \arguments{
-\item{td}{t-digest object}
+\item{td}{t-Digest object}
 
 \item{val}{value}
 
 \item{count}{count}
 }
+\value{
+the original, updated \code{tdigest} object
+}
 \description{
-Add a value to the t-digest with the specified count
+Add a value to the t-Digest with the specified count
 }
 \examples{
 td <- td_create(10)

@@ -7,9 +7,12 @@
 td_quantile_of(td, val)
 }
 \arguments{
-\item{td}{t-digest object}
+\item{td}{t-Digest object}
 
 \item{val}{value}
+}
+\value{
+the computed quantile (\code{double})
 }
 \description{
 Return the quantile of the value
