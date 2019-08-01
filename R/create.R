@@ -43,7 +43,7 @@ tdigest <- function(vec, compression=100) {
 #' @param probs numeric vector of probabilities with values in range 0:1
 #' @export
 #' @return a `numeric` vector containing the requested quantile values
-#' @references <https://raw.githubusercontent.com/tdunning/t-Digest/master/docs/t-Digest-paper/histo.pdf>
+#' @references [Computing Extremely Accurate Quantiles Using t-Digests](https://arxiv.org/abs/1902.04023)
 #' @examples
 #' set.seed(1492)
 #' x <- sample(0:100, 1000000, replace = TRUE)
@@ -95,7 +95,7 @@ print.tdigest <- function(x, ...) {
 #'        (~1 million datapoints). Defaults to 100.
 #' @export
 #' @return a `tdigest` object
-#' @references <https://raw.githubusercontent.com/tdunning/t-Digest/master/docs/t-Digest-paper/histo.pdf>
+#' @references [Computing Extremely Accurate Quantiles Using t-Digests](https://arxiv.org/abs/1902.04023)
 #' @examples
 #' td <- td_create(10)
 td_create <- function(compression=100) {

@@ -30,5 +30,5 @@ Allocate a new histogram
 td <- td_create(10)
 }
 \references{
-\url{https://raw.githubusercontent.com/tdunning/t-Digest/master/docs/t-Digest-paper/histo.pdf}
+\href{https://arxiv.org/abs/1902.04023}{Computing Extremely Accurate Quantiles Using t-Digests}
 }
