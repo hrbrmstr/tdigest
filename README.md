@@ -19,7 +19,6 @@ status](https://www.r-pkg.org/badges/version/tdigest)](https://www.r-pkg.org/pkg
 ![Minimal R
 Version](https://img.shields.io/badge/R%3E%3D-3.5.0-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3357770.svg)](https://doi.org/10.5281/zenodo.3357770)
 
 # tdigest
@@ -162,9 +161,9 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min        lq        mean    median         uq        max neval
-##     tdigest     4.965     6.415    18.14998     9.289    26.7875     75.129   100
-##  r_quantile 59227.919 62490.644 65431.59551 64246.659 66578.5085 127656.518   100
+##        expr       min       lq        mean    median       uq        max neval cld
+##     tdigest     7.868     9.23    19.94667    10.203    32.59     34.672   100  a 
+##  r_quantile 52673.523 53300.41 55414.58517 53616.418 56251.37 108089.810   100   b
 ```
 
 ## tdigest Metrics
@@ -173,7 +172,7 @@ microbenchmark::microbenchmark(
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
 | C            |        3 | 0.27 | 350 | 0.65 |          46 | 0.36 |       26 | 0.11 |
 | R            |        6 | 0.55 | 140 | 0.26 |          31 | 0.24 |      139 | 0.57 |
-| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       53 | 0.22 |
+| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       52 | 0.21 |
 | C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.08 |       26 | 0.11 |
 
 ## Code of Conduct

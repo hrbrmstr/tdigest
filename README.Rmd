@@ -8,9 +8,8 @@ hrbrpkghelpr::global_opts()
 ```
 
 ```{r badges, results='asis', echo=FALSE, cache=FALSE}
-hrbrpkghelpr::stinking_badges()
+hrbrpkghelpr::stinking_badges(zenodo = "10.5281/3357770")
 ```
- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3357770.svg)](https://doi.org/10.5281/zenodo.3357770)
 
 # tdigest
 
