@@ -46,6 +46,8 @@ Ertl](https://arxiv.org/abs/1902.04023) for more details on t-Digests.
 
 The following functions are implemented:
 
+  - `as.list.tdigest`: Serialize a tdigest object to an R list or
+    unserialize a serialized tdigest list back into a tdigest object
   - `td_add`: Add a value to the t-Digest with the specified count
   - `td_create`: Allocate a new histogram
   - `td_merge`: Merge one t-Digest into another
@@ -80,7 +82,7 @@ library(tdigest)
 
 # current version
 packageVersion("tdigest")
-## [1] '0.3.0'
+## [1] '0.4.0'
 ```
 
 ### Basic (Low-level interface)
@@ -138,6 +140,42 @@ quantile(td)
 ## [1]   0.00000  24.74751  49.99666  75.24783 100.00000
 ```
 
+#### Serialization
+
+These \[de\]serialization functions make it possible to create &
+populate a tdigest, serialize it out, read it in at a later time and
+continue populating it enabling compact distribution accumulation &
+storage for large, “continuous” datasets.
+
+``` r
+set.seed(1492)
+x <- sample(0:100, 1000000, replace = TRUE)
+td <- tdigest(x, 1000)
+
+tquantile(td, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
+##  [1]   0.0000000   0.8099857   9.6725790  19.7533723  29.7448283  39.7544675  49.9966628  60.0235148  70.2067574
+## [10]  80.3090454  90.2594642  99.4269454 100.0000000
+
+str(in_r <- as.list(td), 1)
+## List of 7
+##  $ compression   : num 1000
+##  $ cap           : int 6010
+##  $ merged_nodes  : int 226
+##  $ unmerged_nodes: int 0
+##  $ merged_count  : num 1e+06
+##  $ unmerged_count: num 0
+##  $ nodes         :List of 2
+##  - attr(*, "class")= chr [1:2] "tdigest_list" "list"
+
+td2 <- as_tdigest(in_r)
+tquantile(td2, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
+##  [1]   0.0000000   0.8099857   9.6725790  19.7533723  29.7448283  39.7544675  49.9966628  60.0235148  70.2067574
+## [10]  80.3090454  90.2594642  99.4269454 100.0000000
+
+identical(in_r, as.list(td2))
+## [1] TRUE
+```
+
 #### ALTREP-aware
 
 ``` r
@@ -161,19 +199,19 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr       min       lq        mean    median       uq        max neval cld
-##     tdigest     7.868     9.23    19.94667    10.203    32.59     34.672   100  a 
-##  r_quantile 52673.523 53300.41 55414.58517 53616.418 56251.37 108089.810   100   b
+##        expr      min        lq       mean    median        uq        max neval cld
+##     tdigest     8.02     9.175    20.2545    10.185    32.682     43.003   100  a 
+##  r_quantile 52657.60 53307.742 55924.6932 54093.988 56487.027 108778.946   100   b
 ```
 
 ## tdigest Metrics
 
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
-| C            |        3 | 0.27 | 350 | 0.65 |          46 | 0.36 |       26 | 0.11 |
-| R            |        6 | 0.55 | 140 | 0.26 |          31 | 0.24 |      139 | 0.57 |
-| Rmd          |        1 | 0.09 |  36 | 0.07 |          40 | 0.31 |       52 | 0.21 |
-| C/C++ Header |        1 | 0.09 |  10 | 0.02 |          10 | 0.08 |       26 | 0.11 |
+| C            |        3 | 0.27 | 484 | 0.68 |          77 | 0.44 |       46 | 0.16 |
+| R            |        6 | 0.55 | 157 | 0.22 |          35 | 0.20 |      156 | 0.54 |
+| Rmd          |        1 | 0.09 |  44 | 0.06 |          47 | 0.27 |       58 | 0.20 |
+| C/C++ Header |        1 | 0.09 |  24 | 0.03 |          16 | 0.09 |       30 | 0.10 |
 
 ## Code of Conduct
 

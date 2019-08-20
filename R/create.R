@@ -208,3 +208,32 @@ length.tdigest <- function(x) {
   if ((i<=0) || (i>1)) return(NULL)
   td_value_at(x, i)
 }
+
+#' Serialize a tdigest object to an R list or unserialize a serialized tdigest
+#' list back into a tdigest object
+#'
+#' These functions make it possible to create & populate a tdigest, serialize it out,
+#' read it in at a later time and continue populating it enabling compact
+#' distribution accumulation & storage for large, "continuous" datasets.
+#'
+#' @param x a tdigest object or a tdigest_list object
+#' @param ... unused
+#' @export
+#' @examples
+#' set.seed(1492)
+#' x <- sample(0:100, 1000000, replace = TRUE)
+#' td <- tdigest(x, 1000)
+#' as_tdigest(as.list(td))
+as.list.tdigest <- function(x, ...) {
+  stopifnot(inherits(x, "tdigest"))
+  out <- .Call("Rg_toR", x)
+  class(out) <- c("tdigest_list", "list")
+  out
+}
+
+#' @rdname as.list.tdigest
+#' @export
+as_tdigest <- function(x) {
+  stopifnot(inherits(x, "tdigest_list"))
+  .Call("Rg_fromR", x)
+}

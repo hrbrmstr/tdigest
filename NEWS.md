@@ -1,3 +1,6 @@
+0.4.0
+* Serialization & deserialization of tdigest objects
+
 0.3.0
 * ALTREP-aware
 * `length()` and `[` implemented for `tdigest` objects

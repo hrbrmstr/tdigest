@@ -63,3 +63,12 @@ td <- tdigest(x.altrep)
 expect_equal(as.integer(td[0.1]), 93051)
 expect_equal(as.integer(td[0.5]), 491472)
 expect_equal(length(td), 1000000)
+
+context("Serialization test")
+
+set.seed(1492)
+x <- sample(0:100, 1000000, replace = TRUE)
+td <- tdigest(x, 1000)
+a <- as.list(td)
+b <- as.list(as_tdigest(a))
+expect_true(identical(a, b))
