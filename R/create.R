@@ -78,6 +78,10 @@ print.tdigest <- function(x, ...) {
     cat(
       "<tdigest; size=",
       formatC(td_total_count(x), format="fg", big.mark=","),
+      "; compression=",
+      formatC(.Call("Rg_compression", x, PACKAGE="tdigest"), format="fg", big.mark=","),
+      "; cap=",
+      formatC(.Call("Rg_cap", x, PACKAGE="tdigest"), format="fg", big.mark=","),
       ">\n", sep=""
     )
   }
@@ -226,7 +230,7 @@ length.tdigest <- function(x) {
 #' as_tdigest(as.list(td))
 as.list.tdigest <- function(x, ...) {
   stopifnot(inherits(x, "tdigest"))
-  out <- .Call("Rg_toR", x)
+  out <- .Call("Rg_toR", x, PACKAGE="tdigest")
   class(out) <- c("tdigest_list", "list")
   out
 }
@@ -235,5 +239,5 @@ as.list.tdigest <- function(x, ...) {
 #' @export
 as_tdigest <- function(x) {
   stopifnot(inherits(x, "tdigest_list"))
-  .Call("Rg_fromR", x)
+  .Call("Rg_fromR", x, PACKAGE="tdigest")
 }
