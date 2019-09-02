@@ -1,0 +1,132 @@
+image: debian/buster
+packages:
+  - bash-completion
+  - bison
+  - debhelper
+  - default-jdk
+  - g++
+  - gcc
+  - gdb
+  - gfortran
+  - groff-base
+  - libblas-dev
+  - libbz2-dev
+  - libcairo2-dev
+  - libcurl4-openssl-dev
+  - libxml2-dev
+  - libjpeg-dev
+  - liblapack-dev
+  - liblzma-dev
+  - libncurses5-dev
+  - libpango1.0-dev
+  - libpcre3-dev
+  - libpng-dev
+  - libreadline-dev
+  - libtiff5-dev
+  - libx11-dev
+  - libxt-dev
+  - mpack
+  - pandoc
+  - pandoc-citeproc
+  - pandoc-data
+  - subversion
+  - tcl8.6-dev
+  - texinfo
+  - texlive-base
+  - texlive-extra-utils
+  - texlive-fonts-extra
+  - texlive-fonts-recommended
+  - texlive-generic-recommended
+  - texlive-latex-base
+  - texlive-latex-extra
+  - texlive-latex-recommended
+  - tk8.6-dev
+  - x11proto-core-dev
+  - xauth
+  - xdg-utils
+  - xfonts-base
+  - xvfb
+  - zlib1g-dev
+  - ed
+  - less
+  - locales
+  - vim-tiny
+  - wget
+  - ca-certificates
+  - fonts-texgyre
+  - libssl-dev
+  - libcurl4-openssl-dev
+  - r-base
+  - r-base-dev
+  - r-recommended
+  - r-cran-crayon
+  - r-cran-curl
+  - r-cran-desc
+  - r-cran-httr
+  - r-cran-jsonlite
+  - r-cran-devtools
+  - r-cran-knitr
+  - r-cran-rmarkdown
+  - r-cran-rprojroot
+  - r-cran-stringi
+  - r-cran-testthat
+  - r-cran-testit
+  - r-cran-tidyverse
+  - r-cran-xml2
+environment:
+  R_PACKAGE: tdigest
+sources:
+  - https://git.sr.ht/~hrbrmstr/tdigest
+tasks:
+  - action: email
+    to: hrbrmstr <bob@rud.is>
+tasks:
+  - setup: |
+      echo "en_US.UTF-8 UTF-8" > loc
+      sudo cp loc /etc/locale.gen
+      sudo locale-gen --purge "en_US.UTF-8"
+      sudo /usr/sbin/update-locale LANG=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
+      export LANG=en_US.UTF-8
+      export LANGUAGE=en_US.UTF-8
+      echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' > ~/.Rprofile
+      echo 'R_LIBS_USER=/home/build/packages' > ~/.Renviron
+      mkdir /home/build/packages
+      export _R_CHECK_URLS_USE_CURL_=FALSE
+      export _R_CHECK_LENGTH_1_CONDITION_=TRUE
+      export _R_CHECK_LENGTH_1_LOGIC2_=TRUE
+      export _R_CHECK_TOPLEVEL_FILES_=TRUE
+      export _R_CHECK_VC_DIRS_=TRUE
+      export _R_CHECK_TIMINGS_=10
+      export _R_CHECK_INSTALL_DEPENDS_=TRUE
+      export _R_CHECK_SUGGESTS_ONLY_=TRUE
+      export _R_CHECK_NO_RECOMMENDED_=TRUE
+      export _R_CHECK_EXECUTABLES_EXCLUSIONS_=FALSE
+      export _R_CHECK_DOC_SIZES2_=TRUE
+      export _R_CHECK_CODE_ASSIGN_TO_GLOBALENV_=TRUE
+      export _R_CHECK_CODE_ATTACH_=TRUE
+      export _R_CHECK_CODE_DATA_INTO_GLOBALENV_=TRUE
+      export _R_CHECK_CODE_USAGE_VIA_NAMESPACES_=TRUE
+      export _R_CHECK_DOT_FIRSTLIB_=TRUE
+      export _R_CHECK_DEPRECATED_DEFUNCT_=TRUE
+      export _R_CHECK_REPLACING_IMPORTS_=TRUE
+      export _R_CHECK_SCREEN_DEVICE_=stop
+      export _R_CHECK_TOPLEVEL_FILES_=TRUE
+      export _R_CHECK_S3_METHODS_NOT_REGISTERED_=TRUE
+      export _R_CHECK_OVERWRITE_REGISTERED_S3_METHODS_=TRUE
+      export _R_CHECK_PRAGMAS_=TRUE
+      export _R_CHECK_CRAN_INCOMING_USE_ASPELL_=TRUE
+      export _R_CHECK_COMPILATION_FLAGS_=TRUE
+      export _R_CHECK_R_DEPENDS_=warn
+      export _R_CHECK_SERIALIZATION_=TRUE
+      export _R_CHECK_R_ON_PATH_=TRUE
+      export _R_CHECK_PACKAGES_USED_IN_TESTS_USE_SUBDIRS_=TRUE
+      export _R_CHECK_SHLIB_OPENMP_FLAGS_=TRUE
+      export _R_CHECK_CONNECTIONS_LEFT_OPEN_=TRUE
+      export _R_CHECK_FUTURE_FILE_TIMESTAMPS_=TRUE
+      export _R_CHECK_AUTOCONF_=TRUE
+  - build: |
+      sudo R CMD javareconf
+      Rscript -e 'install.packages(c("covr", "tinytest"))'
+      R CMD build ${R_PACKAGE}
+      R CMD check ${R_PACKAGE}_*gz

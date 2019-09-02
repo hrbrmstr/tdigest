@@ -8,6 +8,8 @@ by](https://img.shields.io/badge/Keybase-Verified-brightgreen.svg)](https://keyb
 %](https://img.shields.io/badge/Signed_Commits-100%25-lightgrey.svg)
 [![Linux build
 Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest)
+[![builds.sr.ht
+status](https://builds.sr.ht/~hrbrmstr/tdigest.svg)](https://builds.sr.ht/~hrbrmstr/tdigest?)
 [![Windows build
 status](https://ci.appveyor.com/api/projects/status/github/hrbrmstr/tdigest?svg=true)](https://ci.appveyor.com/project/hrbrmstr/tdigest)
 [![Coverage
@@ -91,14 +93,14 @@ packageVersion("tdigest")
 td <- td_create(10)
 
 td
-## <tdigest; size=0>
+## <tdigest; size=0; compression=10; cap=70>
 
 td_total_count(td)
 ## [1] 0
 
 td_add(td, 0, 1) %>% 
   td_add(10, 1)
-## <tdigest; size=2>
+## <tdigest; size=2; compression=10; cap=70>
 
 td_total_count(td)
 ## [1] 2
@@ -209,7 +211,7 @@ microbenchmark::microbenchmark(
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 | :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
 | C            |        3 | 0.27 | 484 | 0.68 |          77 | 0.44 |       46 | 0.16 |
-| R            |        6 | 0.55 | 157 | 0.22 |          35 | 0.20 |      156 | 0.54 |
+| R            |        6 | 0.55 | 161 | 0.23 |          35 | 0.20 |      156 | 0.54 |
 | Rmd          |        1 | 0.09 |  44 | 0.06 |          47 | 0.27 |       58 | 0.20 |
 | C/C++ Header |        1 | 0.09 |  24 | 0.03 |          16 | 0.09 |       30 | 0.10 |
 
