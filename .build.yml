@@ -78,9 +78,6 @@ environment:
 sources:
   - https://git.sr.ht/~hrbrmstr/tdigest
 tasks:
-  - action: email
-    to: hrbrmstr <bob@rud.is>
-tasks:
   - setup: |
       echo "en_US.UTF-8 UTF-8" > loc
       sudo cp loc /etc/locale.gen
@@ -91,7 +88,17 @@ tasks:
       export LANGUAGE=en_US.UTF-8
       echo 'options(repos = c(CRAN = "https://cloud.r-project.org"))' > ~/.Rprofile
       echo 'R_LIBS_USER=/home/build/packages' > ~/.Renviron
-      mkdir /home/build/packages
+      mkdir -p ~/packages ~/.R
+      echo "CFLAGS=" > ~/.R/Makevars
+      echo "CPPFLAGS= " >> ~/.R/Makevars
+      echo "CXXFLAGS=" >> ~/.R/Makevars
+      echo "FCFLAGS=" >> ~/.R/Makevars
+      echo "FFLAGS=" >> ~/.R/Makevars
+      echo "GCJFLAGS=" >> ~/.R/Makevars
+      echo "LDFLAGS =" >> ~/.R/Makevars
+      echo "OBJCFLAGS=" >> ~/.R/Makevars
+      echo "OBJCXXFLAGS=" >> ~/.R/Makevars
+      export _R_CHECK_CRAN_INCOMING_=FALSE
       export _R_CHECK_URLS_USE_CURL_=FALSE
       export _R_CHECK_LENGTH_1_CONDITION_=TRUE
       export _R_CHECK_LENGTH_1_LOGIC2_=TRUE
@@ -127,6 +134,6 @@ tasks:
       export _R_CHECK_AUTOCONF_=TRUE
   - build: |
       sudo R CMD javareconf
-      Rscript -e 'install.packages(c("covr", "tinytest"))'
+      Rscript -e "devtools::install_deps(pkg = '${R_PACKAGE}', upgrade = 'never', dependencies = TRUE)"
       R CMD build ${R_PACKAGE}
-      R CMD check ${R_PACKAGE}_*gz
+      R CMD check --as-cran ${R_PACKAGE}_*gz
