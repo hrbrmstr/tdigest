@@ -18,7 +18,6 @@ build/*
 .vscode
 tests/vendor/*
 
-
 # Prerequisites
 *.d
 
