@@ -1,0 +1,2 @@
+add_executable(quantile_example quantile_example.c)
+target_link_libraries(quantile_example mergingdigest)

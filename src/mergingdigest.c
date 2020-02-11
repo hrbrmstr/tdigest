@@ -2,40 +2,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-
-#include "tdigest.h"
+#include "mergingdigest.h"
 
 void bbzero(void *to, size_t count) {
   memset(to, 0, count);
 }
-
-// #define MM_PI 3.14159265358979323846
-//
-// typedef struct node {
-//   double mean;
-//   double count;
-// } node_t;
-//
-// void bbzero(void *to, size_t count) {
-//   memset(to, 0, count);
-// }
-//
-// struct td_histogram {
-//   // compression is a setting used to configure the size of centroids when merged.
-//   double compression;
-//
-//   // cap is the total size of nodes
-//   int cap;
-//   // merged_nodes is the number of merged nodes at the front of nodes.
-//   int merged_nodes;
-//   // unmerged_nodes is the number of buffered nodes.
-//   int unmerged_nodes;
-//
-//   double merged_count;
-//   double unmerged_count;
-//
-//   node_t nodes[];
-// };
 
 static bool is_very_small(double val) {
   return !(val > .000000001 || val < -.000000001);
