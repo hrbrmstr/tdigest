@@ -45,6 +45,10 @@ struct td_histogram {
 
 typedef struct td_histogram td_histogram_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // td_new allocates a new histogram.
 // It is similar to init but assumes that it can use malloc.
 td_histogram_t *td_new(double compression);
@@ -54,6 +58,10 @@ void td_free(td_histogram_t *h);
 
 // td_add adds val to h with the specified count.
 void td_add(td_histogram_t *h, double val, double count);
+
+void merge(td_histogram_t *h);
+
+int td_number_centroids(td_histogram_t *h);
 
 // td_merge merges the data from from into into.
 void td_merge(td_histogram_t *into, td_histogram_t *from);
@@ -68,3 +76,7 @@ double td_quantile_of(td_histogram_t *h, double val);
 
 // td_total_count returns the total count contained in h.
 double td_total_count(td_histogram_t *h);
+
+#ifdef __cplusplus
+}
+#endif

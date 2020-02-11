@@ -8,7 +8,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 
-option(BUILD_TESTS "Build tests" OFF)
+option(BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tests")
 endif(BUILD_TESTS)

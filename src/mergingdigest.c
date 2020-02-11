@@ -24,7 +24,11 @@ static int next_node(td_histogram_t *h) {
   return h->merged_nodes + h->unmerged_nodes;
 }
 
-static void merge(td_histogram_t *h);
+void merge(td_histogram_t *h);
+
+int td_number_centroids(td_histogram_t *h){
+     return next_node(h);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructors
@@ -189,7 +193,7 @@ static int compare_nodes(const void *v1, const void *v2) {
      }
 }
 
-static void merge(td_histogram_t *h) {
+void merge(td_histogram_t *h) {
      if (h->unmerged_nodes == 0) {
           return;
      }
