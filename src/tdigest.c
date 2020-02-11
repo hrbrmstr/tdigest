@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-#include "mergingdigest.h"
+#include "tdigest.h"
 
 void bbzero(void *to, size_t count) {
   memset(to, 0, count);

@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "mergingdigest.h"
+#include "tdigest.h"
 #include <math.h>
 #include <random>
 
@@ -45,8 +45,6 @@ static void BM_hdr_record_values(benchmark::State &state)
     {
         i = dist(rng);
     }
-
-    // benchmark::DoNotOptimize(mdigest->);
 
     while (state.KeepRunning())
     {

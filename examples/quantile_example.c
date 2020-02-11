@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "mergingdigest.h"
+#include "tdigest.h"
 
 #define STREAM_SIZE 1000000
 
