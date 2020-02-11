@@ -30,7 +30,7 @@ static inline double randMToN(double M, double N)
     return M + (rand() / (RAND_MAX / (N - M)));
 }
 
-static void BM_hdr_record_values(benchmark::State &state)
+static void BM_td_add_uniform_dist(benchmark::State &state)
 {
     const double compression = state.range(0);
     const int64_t stream_size = state.range(1);
@@ -62,7 +62,41 @@ static void BM_hdr_record_values(benchmark::State &state)
     }
 }
 
+
+static void BM_td_add_lognormal_dist(benchmark::State &state)
+{
+    const double compression = state.range(0);
+    const int64_t stream_size = state.range(1);
+    td_histogram_t *mdigest = td_new(compression);
+    std::vector<double> input;
+    input.resize(stream_size, 0);
+    std::mt19937_64 rng;
+    rng.seed(std::random_device()());
+    std::lognormal_distribution<double> dist(1,0.5);
+
+    for (double &i : input)
+    {
+        i = dist(rng);
+    }
+
+    while (state.KeepRunning())
+    {
+        for (int i = 0; i < stream_size; ++i)
+        {
+            td_add(mdigest, input[i], 1);
+        }
+        state.SetItemsProcessed(stream_size);
+        // Set the counter as a thread-average quantity. It will
+        // be presented divided by the number of threads ( in our case just one thread ).
+        merge(mdigest);
+        state.counters["Centroid_Count"] = benchmark::Counter(td_number_centroids(mdigest), benchmark::Counter::kAvgThreads);
+        // read/write barrier
+        benchmark::ClobberMemory();
+    }
+}
+
 // Register the functions as a benchmark
-BENCHMARK(BM_hdr_record_values)->Apply(generate_arguments_pairs);
+BENCHMARK(BM_td_add_uniform_dist)->Apply(generate_arguments_pairs);
+BENCHMARK(BM_td_add_lognormal_dist)->Apply(generate_arguments_pairs);
 
 BENCHMARK_MAIN();
