@@ -33,4 +33,4 @@ jobs:
       - checkout
       - run:
           name: Point Unit Testing
-          command: 'cd build && ctest'
+          command: 'ls -la && cd build && ctest'
