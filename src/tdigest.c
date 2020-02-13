@@ -56,6 +56,7 @@ static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
     .cap = (buf_size - sizeof(td_histogram_t)) / sizeof(node_t),
     .min = __DBL_MAX__,
     .max = __DBL_MIN__,
+    .total_compressions = 0,
     .merged_nodes = 0,
     .merged_count = 0,
     .unmerged_nodes = 0,
@@ -218,6 +219,8 @@ void td_compress(td_histogram_t *h) {
           double q0 = count_so_far / total_count;
           double q2 = (count_so_far + proposed_count) / total_count;
           bool should_add = (z <= (q0 * (1 - q0))) && (z <= (q2 * (1 - q2)));
+          // next point will fit
+          // so merge into existing centroid
           if (should_add) {
                h->nodes[cur].count += h->nodes[i].count;
                double delta = h->nodes[i].mean - h->nodes[cur].mean;
@@ -239,6 +242,7 @@ void td_compress(td_histogram_t *h) {
      h->merged_count = total_count;
      h->unmerged_nodes = 0;
      h->unmerged_count = 0;
+     h->total_compressions++;
 }
 
 
