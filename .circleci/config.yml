@@ -8,7 +8,7 @@ commands:
       platform:
         type: string
     steps:
-      - build
+      - checkout
       - run:
           name: Build
           command: make
@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Install CMAKE
           command: 'apt-get update && sudo apt-get install -y cmake'
-      - build
+      - checkout
       - run:
           name: Point Unit Testing
           command: 'cd build && ctest tests/td_test'
