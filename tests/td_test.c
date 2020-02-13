@@ -16,7 +16,7 @@
 
 #define STREAM_SIZE 1000000
 
-static double __randU(double M, double N)
+static double randfrom(double M, double N)
 {
     return M + (rand() / (RAND_MAX / (N - M)));
 }
@@ -38,8 +38,41 @@ static void load_histograms()
 
     for (i = 0; i < STREAM_SIZE; i++)
     {
-        td_add(histogram, __randU(0, 10), 1);
+        td_add(histogram, randfrom(0, 10), 1);
     }
+}
+
+MU_TEST(test_basic)
+{
+    td_histogram_t *t = td_new(10);
+    mu_assert(t != NULL, "created_histogram");
+    td_add(t, 0, 1);
+    td_add(t, 10, 1);
+    mu_assert_double_eq(0.0, td_quantile(t, .1));
+    mu_assert_double_eq(5.0, td_quantile(t, .5));
+    td_free(t);
+}
+
+MU_TEST(test_uniform_rand)
+{
+    srand(time(NULL));
+    clock_t start = clock();
+    td_histogram_t *t = td_new(1000);
+    int N = 1000000;
+    for (int i = 0; i < N; i++)
+    {
+        td_add(t, randfrom(0, 100), 1);
+    }
+    clock_t end = clock();
+    double total = ((double)(end) - (double)(start)) / (double)(CLOCKS_PER_SEC);
+    double per = total / (double)(N);
+    // printf("it took %f or %f per\n", total, per);
+    double f[13] = {0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1};
+    for (int i = 0; i < 13; i++)
+    {
+        // printf("%f: %f\n", f[i], td_cdf(t, f[i]));
+    }
+    td_free(t);
 }
 
 // MU_TEST(test_init)
@@ -56,6 +89,39 @@ static void load_histograms()
 //     mu_assert_double_eq(td_size(h), 0);
 // }
 
+MU_TEST(test_nans)
+{
+    td_histogram_t *t = td_new(1000);
+    mu_assert(isnan(td_quantile(t, 0)), "empty value at 0");
+    mu_assert(isnan(td_quantile(t, 0.5)), "empty value at .5");
+    mu_assert(isnan(td_quantile(t, 1)), "empty value at 1");
+    td_add(t, 1, 1);
+    mu_assert(isnan(td_quantile(t, -.1)), "value at -0.1");
+    mu_assert(isnan(td_quantile(t, 1.1)), "value at 1.1");
+
+    td_free(t);
+}
+
+MU_TEST(test_two_interp)
+{
+    td_histogram_t *t = td_new(1000);
+    td_add(t, 1, 1);
+    td_add(t, 10, 1);
+    mu_assert(isfinite(td_quantile(t, .9)), "test_two_interp: value at .9");
+    td_free(t);
+}
+
+MU_TEST(test_cdf)
+{
+    td_histogram_t *t = td_new(1000);
+    td_add(t, 1, 1);
+    td_add(t, 10, 1);
+    mu_assert(td_cdf(t, .99) == 0, "test_cdf: .99");
+    mu_assert(td_cdf(t, 1) == .25, "test_cdf: .25");
+    mu_assert(td_cdf(t, 5.5) == .5, "test_cdf: .5");
+    td_free(t);
+}
+
 MU_TEST(test_td_size)
 {
     load_histograms();
@@ -65,37 +131,41 @@ MU_TEST(test_td_size)
 MU_TEST(test_td_max)
 {
     load_histograms();
-    mu_assert_double_eq_epsilon(td_max(histogram), 10.0, 0.001);
+    mu_assert_double_eq_epsilon(10.0, td_max(histogram), 0.001);
 }
 
 MU_TEST(test_td_min)
 {
     load_histograms();
-    mu_assert_double_eq_epsilon(td_min(histogram), 0.0, 0.001);
+    mu_assert_double_eq_epsilon(0.0, td_min(histogram), 0.001);
 }
 
 MU_TEST(test_quantiles)
 {
     load_histograms();
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.0), 0.0, 0.001);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.1), 1.0, 0.001);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.2), 2.0, 0.002);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.3), 3.0, 0.03);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.4), 4.0, 0.04);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.5), 5.0, 0.05);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.6), 6.0, 0.04);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.7), 7.0, 0.03);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.8), 8.0, 0.02);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.9), 9.0, 0.01);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.999), 9.99, 0.01);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.9999), 9.999, 0.01);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 0.9999), 9.999, 0.01);
-    mu_assert_double_eq_epsilon(td_quantile(histogram, 1.0), 10.0, 0.001);
+    mu_assert_double_eq_epsilon(0.0, td_quantile(histogram, 0.0), 0.001);
+    mu_assert_double_eq_epsilon(1.0, td_quantile(histogram, 0.1), 0.01);
+    mu_assert_double_eq_epsilon(2.0, td_quantile(histogram, 0.2), 0.02);
+    mu_assert_double_eq_epsilon(3.0, td_quantile(histogram, 0.3), 0.03);
+    mu_assert_double_eq_epsilon(4.0, td_quantile(histogram, 0.4), 0.04);
+    mu_assert_double_eq_epsilon(5.0, td_quantile(histogram, 0.5), 0.05);
+    mu_assert_double_eq_epsilon(6.0, td_quantile(histogram, 0.6), 0.04);
+    mu_assert_double_eq_epsilon(7.0, td_quantile(histogram, 0.7), 0.03);
+    mu_assert_double_eq_epsilon(8.0, td_quantile(histogram, 0.8), 0.02);
+    mu_assert_double_eq_epsilon(9.0, td_quantile(histogram, 0.9), 0.01);
+    mu_assert_double_eq_epsilon(9.99, td_quantile(histogram, 0.999), 0.01);
+    mu_assert_double_eq_epsilon(9.999, td_quantile(histogram, 0.9999), 0.01);
+    mu_assert_double_eq_epsilon(9.9999, td_quantile(histogram, 0.99999), 0.01);
+    mu_assert_double_eq_epsilon(10.0, td_quantile(histogram, 1.0), 0.001);
 }
 
 MU_TEST_SUITE(test_suite)
 {
-    // MU_RUN_TEST(test_init);
+    MU_RUN_TEST(test_basic);
+    MU_RUN_TEST(test_uniform_rand);
+    MU_RUN_TEST(test_nans);
+    MU_RUN_TEST(test_two_interp);
+    MU_RUN_TEST(test_cdf);
     MU_RUN_TEST(test_td_size);
     MU_RUN_TEST(test_td_max);
     MU_RUN_TEST(test_td_min);
