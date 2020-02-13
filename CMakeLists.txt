@@ -16,9 +16,13 @@ macro (add_compiler_flags)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_FLAGS}")
 endmacro ()
 
-project(tdigest VERSION 0.4.0 LANGUAGES C)
+project(tdigest)
 
-set(CMAKE_BUILD_TYPE Release)
+# Set build type to RELEASE by default:
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type provided, default to RELEASE.")
+  set(CMAKE_BUILD_TYPE "RELEASE")
+endif()
 
 # --- Build options ---
 option(BUILD_SHARED "Build shared library" ON)
