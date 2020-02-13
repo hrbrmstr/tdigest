@@ -69,7 +69,7 @@ library_all:
 	( cd build ; cmake $(CMAKE_LIBRARY_OPTIONS) .. ; $(MAKE) )
 
 # just build the static and shared libraries and tests
-test:
+unit_tests:
 	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) )
 
 # build all
