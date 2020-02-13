@@ -5,9 +5,7 @@ jobs:
   build:
     docker:
       - image: "debian:stretch"
-    # working_directory: ~/
-    steps:
-      
+    steps:    
       - run:
           name: Installing SUDO
           command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
@@ -20,6 +18,6 @@ jobs:
       - checkout
       - run:
           name: Point Unit Testing
-          command: 'ls -la && make clean && make unit_tests && cd build && make test'
+          command: 'make clean && make unit_tests && cd build && make test'
 
           
