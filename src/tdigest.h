@@ -1,34 +1,41 @@
 #pragma once
-
-////////////////////////////////////////////////////////////////////////////////
-// tdigest
-//
-// Copyright (c) 2018 Andrew Werner, All rights reserved.
-//
-// tdigest is an implementation of Ted Dunning's streaming quantile estimation
-// data structure.
-// This implementation is intended to be like the new MergingHistogram.
-// It focuses on being in portable C that should be easy to integrate into other
-// languages. In particular it provides mechanisms to preallocate all memory
-// at construction time.
-//
-// The implementation is a direct descendent of
-//  https://github.com/tdunning/t-digest/
-//
-////////////////////////////////////////////////////////////////////////////////
-
 #include <stdlib.h>
+
+/**
+ * Adaptive histogram based on something like streaming k-means crossed with Q-digest.
+ * The implementation is a direct descendent of MergingDigest
+ * https://github.com/tdunning/t-digest/
+ * 
+ * Copyright (c) 2018 Andrew Werner, All rights reserved.
+ *
+ * The special characteristics of this algorithm are:
+ *
+ * - smaller summaries than Q-digest
+ *
+ * - provides part per million accuracy for extreme quantiles and typically &lt;1000 ppm accuracy for middle quantiles
+ *
+ * - fast
+ *
+ * - simple
+ *
+ * - easy to adapt for use with map-reduce
+ */
 
 #define MM_PI 3.14159265358979323846
 
-typedef struct node {
+typedef struct node
+{
   double mean;
   double count;
 } node_t;
 
-struct td_histogram {
+struct td_histogram
+{
   // compression is a setting used to configure the size of centroids when merged.
   double compression;
+
+  double min;
+  double max;
 
   // cap is the total size of nodes
   int cap;
@@ -46,36 +53,120 @@ struct td_histogram {
 typedef struct td_histogram td_histogram_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// td_new allocates a new histogram.
-// It is similar to init but assumes that it can use malloc.
-td_histogram_t *td_new(double compression);
+  /**
+ * Allocate the memory, initialise the t-digest, and return the histogram as output parameter.
+ * @param compression The compression parameter. 
+ * 100 is a common value for normal uses. 
+ * 1000 is extremely large. 
+ * The number of centroids retained will be a smallish (usually less than 10) multiple of this number.
+ * @return the histogram on success, NULL if allocation failed.
+ */
+  td_histogram_t *td_new(double compression);
 
-// td_free frees the memory associated with h.
-void td_free(td_histogram_t *h);
+  /**
+ * Frees the memory associated with the t-digest.
+ *
+ * @param h The histogram you want to free.
+ */
+  void td_free(td_histogram_t *h);
 
-// td_add adds val to h with the specified count.
-void td_add(td_histogram_t *h, double val, double count);
+  /**
+ * Reset a histogram to zero - empty out a histogram and re-initialise it
+ *
+ * If you want to re-use an existing histogram, but reset everything back to zero, this
+ * is the routine to use.
+ *
+ * @param h The histogram you want to reset to empty.
+ *
+ */
+  void td_reset(td_histogram_t *h);
 
-void merge(td_histogram_t *h);
+  /**
+ * Adds a sample to a histogram.
+ *
+ * @param val The value to add.
+ * @param weight The weight of this point.
+ */
+  void td_add(td_histogram_t *h, double val, double weight);
 
-int td_number_centroids(td_histogram_t *h);
+  /**
+ * Re-examines a t-digest to determine whether some centroids are redundant.  If your data are
+ * perversely ordered, this may be a good idea.  Even if not, this may save 20% or so in space.
+ *
+ * The cost is roughly the same as adding as many data points as there are centroids.  This
+ * is typically &lt; 10 * compression, but could be as high as 100 * compression.
+ * This is a destructive operation that is not thread-safe.
+ * 
+ * @param h The histogram you want to compress.
+ *
+ */
+  void td_compress(td_histogram_t *h);
 
-// td_merge merges the data from from into into.
-void td_merge(td_histogram_t *into, td_histogram_t *from);
+  /**
+ * Merges all of the values from 'from' to 'this' histogram.  
+ *
+ * @param h "This" pointer
+ * @param from Histogram to copy values from.
+ */
+  void td_merge(td_histogram_t *h, td_histogram_t *from);
 
-// td_value_at queries h for the value at q.
-// If q is not in [0, 1], NAN will be returned.
-double td_value_at(td_histogram_t *h, double q);
+  /**
+ * Returns the fraction of all points added which are &le; x.
+ *
+ * @param x The cutoff for the cdf.
+ * @return The fraction of all data which is less or equal to x.
+ */
+  double td_cdf(td_histogram_t *h, double x);
 
-// td_value_at queries h for the quantile of val.
-// The returned value will be in [0, 1].
-double td_quantile_of(td_histogram_t *h, double val);
+  /**
+   * Returns an estimate of the cutoff such that a specified fraction of the data
+   * added to this TDigest would be less than or equal to the cutoff.
+   *
+   * @param q The desired fraction
+   * @return The value x such that cdf(x) == q;
+   */
+  double td_quantile(td_histogram_t *h, double q);
 
-// td_total_count returns the total count contained in h.
-double td_total_count(td_histogram_t *h);
+  /**
+ * Returns the current compression factor.
+ *
+ * @return The compression factor originally used to set up the TDigest.
+ */
+  int td_compression(td_histogram_t *h);
+
+  /**
+   * Returns the number of points that have been added to this TDigest.
+   *
+   * @return The sum of the weights on all centroids.
+   */
+  double td_size(td_histogram_t *h);
+
+  /**
+ * Returns the number of centroids being used by this TDigest.
+ *
+ * @return The number of centroids being used.
+ */
+  int td_centroid_count(td_histogram_t *h);
+
+  /**
+ * Get minimum value from the histogram.  Will return __DBL_MAX__ if the histogram
+ * is empty.
+ *
+ * @param h "This" pointer
+ */
+  double td_min(td_histogram_t *h);
+
+  /**
+ * Get maximum value from the histogram.  Will return __DBL_MIN__ if the histogram
+ * is empty.
+ *
+ * @param h "This" pointer
+ */
+  double td_max(td_histogram_t *h);
 
 #ifdef __cplusplus
 }

@@ -13,3 +13,8 @@ if (BUILD_BENCHMARK)
               "google.benchmark - microbenchmarks disabled on WIN32 platforms")
     endif()
 endif()
+
+add_executable(td_test td_test.c minunit.h)
+target_link_libraries(td_test tdigest m)
+enable_testing()
+add_test(td_test td_test)
