@@ -1,0 +1,4 @@
+# Ignores all files in tdigest/build except this one.
+*
+*/
+!.gitignore
