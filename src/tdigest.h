@@ -47,8 +47,8 @@ struct td_histogram
   // we run the merge in reverse every other merge to avoid left-to-right bias in merging
   long long total_compressions; 
 
-  double merged_count;
-  double unmerged_count;
+  double merged_weight;
+  double unmerged_weight;
 
   node_t nodes[];
 };
