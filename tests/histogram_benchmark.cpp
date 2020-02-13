@@ -47,13 +47,14 @@ static void BM_td_add_uniform_dist(benchmark::State &state)
         {
             td_add(mdigest, input[i], 1);
         }
+        td_compress(mdigest);
+        // read/write barrier
+        benchmark::ClobberMemory();
         state.SetItemsProcessed(stream_size);
         // Set the counter as a thread-average quantity. It will
         // be presented divided by the number of threads ( in our case just one thread ).
-        td_compress(mdigest);
         state.counters["Centroid_Count"] = benchmark::Counter(td_centroid_count(mdigest), benchmark::Counter::kAvgThreads);
-        // read/write barrier
-        benchmark::ClobberMemory();
+        state.counters["Total_Compressions"] = benchmark::Counter(mdigest->total_compressions, benchmark::Counter::kAvgThreads);
     }
 }
 
@@ -80,13 +81,14 @@ static void BM_td_add_lognormal_dist(benchmark::State &state)
         {
             td_add(mdigest, input[i], 1);
         }
+        td_compress(mdigest);
+        // read/write barrier
+        benchmark::ClobberMemory();
         state.SetItemsProcessed(stream_size);
         // Set the counter as a thread-average quantity. It will
         // be presented divided by the number of threads ( in our case just one thread ).
-        td_compress(mdigest);
         state.counters["Centroid_Count"] = benchmark::Counter(td_centroid_count(mdigest), benchmark::Counter::kAvgThreads);
-        // read/write barrier
-        benchmark::ClobberMemory();
+        state.counters["Total_Compressions"] = benchmark::Counter(mdigest->total_compressions, benchmark::Counter::kAvgThreads);
     }
 }
 
