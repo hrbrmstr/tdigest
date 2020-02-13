@@ -80,3 +80,6 @@ clean: distclean
 
 distclean:
 	rm -rf build/* 
+
+bench: full
+	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10
