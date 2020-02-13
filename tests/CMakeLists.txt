@@ -1,6 +1,4 @@
 
-option(BUILD_BENCHMARK "Build benchmark" ON)
-
 if (BUILD_BENCHMARK)
     if (UNIX)
         set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
