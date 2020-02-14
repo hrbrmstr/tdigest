@@ -17,7 +17,13 @@ jobs:
           command: 'apt-get update && sudo apt-get install -y cmake'
       - checkout
       - run:
-          name: Point Unit Testing
-          command: 'make clean && make unit_tests && cd build && make test'
+          name: Build & Test
+          command: |
+            make clean
+            make unit_tests
+            cd build
+            make test
+            make coverage
+            bash <(curl -s https://codecov.io/bash) -f cmake_coverage.output
 
           
