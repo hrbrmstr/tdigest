@@ -47,64 +47,80 @@ The following functions are implemented:
   - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty
   - `td_max`: Get the maximum value from the histogram.  Will return __DBL_MIN__ if the histogram is empty
 
+## Build notes
 
-## Microbenchmark
+``` 
+# Build
+git clone https://github.com/filipecosta90/tdigest.git
+cd tdigest/
+git submodule update --init --recursive
+make
+```
+## Benchmarking
+
+Assuming you've followed the previous build steps, it should be as easy as:
+``` 
+# Run the benchmark
+make bench
+```
 
 ### Ingestion
 
 #### master
 ``` c
-tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
-2020-02-11 20:02:33
-Running ./tests/histogram_benchmark
+tdigest$ make bench
+build/tests/histogram_benchmark --benchmark_min_time=10
+2020-02-13 18:59:18
+Running build/tests/histogram_benchmark
 Run on (8 X 3900 MHz CPU s)
 CPU Caches:
   L1 Data 32 KiB (x4)
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 0.41, 0.64, 0.83
+Load Average: 1.73, 1.11, 0.88
 ------------------------------------------------------------------------------------------------
 Benchmark                                      Time             CPU   Iterations UserCounters...
 ------------------------------------------------------------------------------------------------
-BM_td_add_uniform_dist/100/10000000   1176119202 ns   1175850805 ns           12 Centroid_Count=74 items_per_second=708.707k/s
-BM_td_add_uniform_dist/200/10000000   1278471605 ns   1278168624 ns           11 Centroid_Count=124 items_per_second=711.245k/s
-BM_td_add_uniform_dist/300/10000000   1342766206 ns   1342446036 ns           10 Centroid_Count=172 items_per_second=744.909k/s
-BM_td_add_uniform_dist/400/10000000   1383712449 ns   1383379933 ns           10 Centroid_Count=212 items_per_second=722.867k/s
-BM_td_add_uniform_dist/500/10000000   1414613825 ns   1414327524 ns           10 Centroid_Count=258 items_per_second=707.05k/s
-BM_td_add_lognormal_dist/100/10000000 1175074553 ns   1175934915 ns           12 Centroid_Count=74 items_per_second=708.656k/s
-BM_td_add_lognormal_dist/200/10000000 1277987660 ns   1278668415 ns           11 Centroid_Count=123 items_per_second=710.967k/s
-BM_td_add_lognormal_dist/300/10000000 1337314230 ns   1337816350 ns           10 Centroid_Count=164 items_per_second=747.487k/s
-BM_td_add_lognormal_dist/400/10000000 1381403323 ns   1381770352 ns           10 Centroid_Count=216 items_per_second=723.709k/s
-BM_td_add_lognormal_dist/500/10000000 1414399110 ns   1414644710 ns           10 Centroid_Count=258 items_per_second=706.891k/s
+BM_td_add_uniform_dist/100/10000000   1217132495 ns   1215202532 ns           11 Centroid_Count=76 Total_Compressions=205.048k items_per_second=748.098k/s
+BM_td_add_uniform_dist/200/10000000   1338093787 ns   1338023019 ns           11 Centroid_Count=120 Total_Compressions=100.695k items_per_second=679.428k/s
+BM_td_add_uniform_dist/300/10000000   1426454139 ns   1426372894 ns           10 Centroid_Count=171 Total_Compressions=60.85k items_per_second=701.079k/s
+BM_td_add_uniform_dist/400/10000000   1489910255 ns   1489865942 ns            9 Centroid_Count=218 Total_Compressions=40.927k items_per_second=745.779k/s
+BM_td_add_uniform_dist/500/10000000   1541433574 ns   1541231001 ns            9 Centroid_Count=253 Total_Compressions=32.621k items_per_second=720.924k/s
+BM_td_add_lognormal_dist/100/10000000 1279235916 ns   1279181475 ns           11 Centroid_Count=75 Total_Compressions=204.968k items_per_second=710.682k/s
+BM_td_add_lognormal_dist/200/10000000 1396900530 ns   1396842464 ns           10 Centroid_Count=124 Total_Compressions=91.795k items_per_second=715.9k/s
+BM_td_add_lognormal_dist/300/10000000 1432398499 ns   1423146494 ns           10 Centroid_Count=167 Total_Compressions=60.787k items_per_second=702.668k/s
+BM_td_add_lognormal_dist/400/10000000 1523148779 ns   1507221068 ns            9 Centroid_Count=207 Total_Compressions=40.828k items_per_second=737.192k/s
+BM_td_add_lognormal_dist/500/10000000 1551385694 ns   1551317295 ns            9 Centroid_Count=259 Total_Compressions=32.652k items_per_second=716.237k/s
 ```
 
 #### perf.improvements branch
 
 ``` c
-tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
-2020-02-11 23:14:02
-Running ./tests/histogram_benchmark
+tdigest$ make bench
+build/tests/histogram_benchmark --benchmark_min_time=10
+2020-02-13 19:03:31
+Running build/tests/histogram_benchmark
 Run on (8 X 3900 MHz CPU s)
 CPU Caches:
   L1 Data 32 KiB (x4)
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 1.04, 0.89, 0.66
+Load Average: 1.04, 1.10, 0.94
 ------------------------------------------------------------------------------------------------
 Benchmark                                      Time             CPU   Iterations UserCounters...
 ------------------------------------------------------------------------------------------------
-BM_td_add_uniform_dist/100/10000000    712450620 ns    712435331 ns           20 Centroid_Count=58 items_per_second=701.818k/s
-BM_td_add_uniform_dist/200/10000000    750092888 ns    750076049 ns           18 Centroid_Count=109 items_per_second=740.666k/s
-BM_td_add_uniform_dist/300/10000000    781008883 ns    780995728 ns           14 Centroid_Count=151 items_per_second=914.583k/s
-BM_td_add_uniform_dist/400/10000000    807423012 ns    807401866 ns           13 Centroid_Count=194 items_per_second=952.724k/s
-BM_td_add_uniform_dist/500/10000000    819856779 ns    819832154 ns           17 Centroid_Count=235 items_per_second=717.507k/s
-BM_td_add_lognormal_dist/100/10000000  699143606 ns    699132082 ns           20 Centroid_Count=54 items_per_second=715.172k/s
-BM_td_add_lognormal_dist/200/10000000  746849189 ns    746836572 ns           18 Centroid_Count=101 items_per_second=743.878k/s
-BM_td_add_lognormal_dist/300/10000000  783043547 ns    783026370 ns           14 Centroid_Count=155 items_per_second=912.212k/s
-BM_td_add_lognormal_dist/400/10000000  806705545 ns    806688685 ns           13 Centroid_Count=198 items_per_second=953.566k/s
-BM_td_add_lognormal_dist/500/10000000  815863658 ns    815799172 ns           17 Centroid_Count=237 items_per_second=721.054k/s
+BM_td_add_uniform_dist/100/10000000    620549600 ns    620516429 ns           22 Centroid_Count=56 Total_Compressions=404.425k items_per_second=732.528k/s
+BM_td_add_uniform_dist/200/10000000    685883111 ns    685849746 ns           20 Centroid_Count=110 Total_Compressions=182.358k items_per_second=729.023k/s
+BM_td_add_uniform_dist/300/10000000    727127573 ns    727096338 ns           19 Centroid_Count=153 Total_Compressions=115.006k items_per_second=723.86k/s
+BM_td_add_uniform_dist/400/10000000    732475918 ns    732445725 ns           19 Centroid_Count=190 Total_Compressions=85.779k items_per_second=718.573k/s
+BM_td_add_uniform_dist/500/10000000    745449159 ns    745410047 ns           19 Centroid_Count=238 Total_Compressions=68.738k items_per_second=706.076k/s
+BM_td_add_lognormal_dist/100/10000000  640487037 ns    640461066 ns           22 Centroid_Count=56 Total_Compressions=404.56k items_per_second=709.716k/s
+BM_td_add_lognormal_dist/200/10000000  687814951 ns    687778693 ns           20 Centroid_Count=104 Total_Compressions=182.567k items_per_second=726.978k/s
+BM_td_add_lognormal_dist/300/10000000  716653546 ns    716618062 ns           19 Centroid_Count=146 Total_Compressions=114.663k items_per_second=734.444k/s
+BM_td_add_lognormal_dist/400/10000000  741198076 ns    741168930 ns           14 Centroid_Count=197 Total_Compressions=63.375k items_per_second=963.729k/s
+BM_td_add_lognormal_dist/500/10000000  744030362 ns    742928616 ns           18 Centroid_Count=238 Total_Compressions=65.103k items_per_second=747.791k/s
 ```
 
 ## Code of Conduct
