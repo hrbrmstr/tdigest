@@ -7,9 +7,6 @@ jobs:
       - image: "debian:stretch"
     steps:  
       - run:
-          name: Pull Submodules
-          command: git submodule update --init --recursive  
-      - run:
           name: Installing SUDO
           command: 'apt update && apt install -y sudo && rm -rf /var/lib/apt/lists/*'
       - run:
@@ -24,7 +21,13 @@ jobs:
       - run:
           name: Installing CURL
           command: 'apt install -y curl'
+      - run:
+          name: Installing GIT
+          command: 'apt install -y git'
       - checkout
+      - run:
+          name: Pull Submodules
+          command: git submodule update --init --recursive
       - run:
           name: Build & Test
           command: |
