@@ -58,9 +58,9 @@ static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
     .max = __DBL_MIN__,
     .total_compressions = 0,
     .merged_nodes = 0,
-    .merged_count = 0,
+    .merged_weight = 0,
     .unmerged_nodes = 0,
-    .unmerged_count = 0,
+    .unmerged_weight = 0,
   };
   return h;
 }
@@ -88,7 +88,7 @@ int td_centroid_count(td_histogram_t *h){
 }
 
 double td_size(td_histogram_t *h) {
-     return h->merged_count + h->unmerged_count;
+     return h->merged_weight + h->unmerged_weight;
 }
 
 double td_cdf(td_histogram_t *h, double val) {
@@ -112,7 +112,7 @@ double td_cdf(td_histogram_t *h, double val) {
           for (i += 1; i < h->merged_nodes && h->nodes[i].mean == n->mean; i++) {
                count_at_value += h->nodes[i].count;
           }
-          return (k + (count_at_value/2)) / h->merged_count;
+          return (k + (count_at_value/2)) / h->merged_weight;
      } else if (val > n->mean) { // past the largest
           return 1;
      } else if (i == 0) {
@@ -126,7 +126,7 @@ double td_cdf(td_histogram_t *h, double val) {
      // and at (nl->count/2 + nr->count/2) we're at nr
      double m = (nr->mean - nl->mean) / (nl->count/2 + nr->count/2);
      double x = (val - nl->mean) / m;
-     return (k + x) / h->merged_count;
+     return (k + x) / h->merged_weight;
 }
 
 
@@ -137,7 +137,7 @@ double td_quantile(td_histogram_t *h, double q) {
      }
      // if left of the first node, use the first node
      // if right of the last node, use the last node, use it
-     double goal = q * h->merged_count;
+     double goal = q * h->merged_weight;
      double k = 0;
      int i = 0;
      node_t *n = NULL;
@@ -191,7 +191,7 @@ void td_add(td_histogram_t *h, double mean, double count) {
           .count = count,
      };
      h->unmerged_nodes++;
-     h->unmerged_count += count;
+     h->unmerged_weight += count;
 }
 
 static int compare_nodes(const void *v1, const void *v2) {
@@ -212,7 +212,7 @@ void td_compress(td_histogram_t *h) {
      }
      int N = h->merged_nodes + h->unmerged_nodes;
      qsort((void *)(h->nodes), N, sizeof(node_t), &compare_nodes);
-     double total_count = h->merged_count + h->unmerged_count;
+     double total_count = h->merged_weight + h->unmerged_weight;
      double denom = 2 * MM_PI * total_count * log(total_count);
      double normalizer = h->compression / denom;
      int cur = 0;
@@ -243,9 +243,9 @@ void td_compress(td_histogram_t *h) {
           }
      }
      h->merged_nodes = cur+1;
-     h->merged_count = total_count;
+     h->merged_weight = total_count;
      h->unmerged_nodes = 0;
-     h->unmerged_count = 0;
+     h->unmerged_weight = 0;
      h->total_compressions++;
 }
 
@@ -259,4 +259,28 @@ double td_max(td_histogram_t *h) {
 
 int td_compression(td_histogram_t *h) {
      return h->compression;
+}
+
+// TODO: 
+const double* td_centroids_weight(td_histogram_t *h){
+     return NULL;
+}
+
+// TODO: 
+const double *td_centroids_mean(td_histogram_t *h){
+     return NULL;
+}
+
+double td_centroids_weight_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes[pos].count;
+}
+
+double td_centroids_mean_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes[pos].mean;
 }

@@ -1,6 +1,6 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
+[![codecov](https://codecov.io/gh/filipecosta90/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/filipecosta90/tdigest)
 # T-Digest
 
 Adaptive histogram based on something like streaming k-means crossed with Q-digest.

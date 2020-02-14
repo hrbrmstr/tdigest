@@ -57,8 +57,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # --- Unit Tests ---
 ENABLE_TESTING()
-# Make the output more verbose
-# add_custom_target(test COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
+
 if(BUILD_TESTS)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tests")
 endif(BUILD_TESTS)

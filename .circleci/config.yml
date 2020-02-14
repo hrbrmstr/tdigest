@@ -30,6 +30,6 @@ jobs:
             cd build
             make test
             make coverage
-            bash <(curl -s https://codecov.io/bash) -f cmake_coverage.output
+            bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
 
           
