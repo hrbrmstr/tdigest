@@ -18,6 +18,9 @@ jobs:
       - run:
           name: Installing LCOV
           command: 'apt install -y lcov'
+      - run:
+          name: Installing CURL
+          command: 'apt install -y curl'
       - checkout
       - run:
           name: Build & Test
