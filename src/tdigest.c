@@ -261,3 +261,27 @@ double td_max(td_histogram_t *h) {
 int td_compression(td_histogram_t *h) {
      return h->compression;
 }
+
+// TODO: 
+const double* td_centroids_weight(td_histogram_t *h){
+     return NULL;
+}
+
+// TODO: 
+const double *td_centroids_mean(td_histogram_t *h){
+     return NULL;
+}
+
+double td_centroids_weight_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes[pos].count;
+}
+
+double td_centroids_mean_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes[pos].mean;
+}

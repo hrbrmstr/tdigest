@@ -171,6 +171,44 @@ extern "C"
  */
   double td_max(td_histogram_t *h);
 
+  /**
+ * Get the full centroids weight array for 'this' histogram.  
+ *
+ * @param h "This" pointer
+ * 
+ * @return The full centroids weight array.
+ */
+  const double *td_centroids_weight(td_histogram_t *h);
+
+  /**
+ * Get the full centroids mean array for 'this' histogram.  
+ *
+ * @param h "This" pointer
+ * 
+ * @return The full centroids mean array.
+ */
+  const double *td_centroids_mean(td_histogram_t *h);
+
+  /**
+ * Get the centroid weight for 'this' histogram and 'pos'.  
+ *
+ * @param h "This" pointer
+ * @param pos centroid position.
+ * 
+ * @return The centroid weight.
+ */
+  double td_centroids_weight_at(td_histogram_t *h, int pos);
+
+  /**
+ * Get the centroid mean for 'this' histogram and 'pos'.  
+ *
+ * @param h "This" pointer
+ * @param pos centroid position.
+ * 
+ * @return The centroid mean.
+ */
+  double td_centroids_mean_at(td_histogram_t *h, int pos);
+
 #ifdef __cplusplus
 }
 #endif
