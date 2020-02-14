@@ -249,7 +249,6 @@ void td_compress(td_histogram_t *h) {
      h->total_compressions++;
 }
 
-
 double td_min(td_histogram_t *h) {
      return h->min;
 }

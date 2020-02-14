@@ -8,16 +8,28 @@ jobs:
     steps:    
       - run:
           name: Installing SUDO
-          command: 'apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*'
+          command: 'apt update && apt install -y sudo && rm -rf /var/lib/apt/lists/*'
       - run:
           name: Installing GCC
-          command: 'apt-get update && apt-get install -y gcc g++'
+          command: 'apt update && apt install -y gcc g++'
       - run:
           name: Install CMAKE
-          command: 'apt-get update && sudo apt-get install -y cmake'
+          command: 'apt install -y cmake'
+      - run:
+          name: Installing LCOV
+          command: 'apt install -y lcov'
+      - run:
+          name: Installing CURL
+          command: 'apt install -y curl'
       - checkout
       - run:
-          name: Point Unit Testing
-          command: 'make clean && make unit_tests && cd build && make test'
+          name: Build & Test
+          command: |
+            make clean
+            make unit_tests
+            cd build
+            make test
+            make coverage
+            bash <(curl -s https://codecov.io/bash) -f cmake_coverage.output
 
           
