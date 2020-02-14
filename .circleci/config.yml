@@ -5,7 +5,10 @@ jobs:
   build:
     docker:
       - image: "debian:stretch"
-    steps:    
+    steps:  
+      - run:
+          name: Pull Submodules
+          command: git submodule update --init --recursive  
       - run:
           name: Installing SUDO
           command: 'apt update && apt install -y sudo && rm -rf /var/lib/apt/lists/*'
