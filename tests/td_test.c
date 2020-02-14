@@ -185,10 +185,13 @@ MU_TEST(test_nans)
     mu_assert(isnan(td_quantile(t, 0)), "empty value at 0");
     mu_assert(isnan(td_quantile(t, 0.5)), "empty value at .5");
     mu_assert(isnan(td_quantile(t, 1)), "empty value at 1");
+    mu_assert(isnan(td_centroids_weight_at(t,1)), "td_centroids_weight_at on pos > h->merged_nodes");
+    mu_assert(isnan(td_centroids_weight_at(t,-1)), "td_centroids_weight_at on pos < 0");
+    mu_assert(isnan(td_centroids_mean_at(t,1)), "td_centroids_mean_at on pos > h->merged_nodes");
+    mu_assert(isnan(td_centroids_mean_at(t,-1)), "td_centroids_mean_at on pos < 0");
     td_add(t, 1, 1);
     mu_assert(isnan(td_quantile(t, -.1)), "value at -0.1");
     mu_assert(isnan(td_quantile(t, 1.1)), "value at 1.1");
-
     td_free(t);
 }
 

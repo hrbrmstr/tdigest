@@ -13,7 +13,7 @@ if(ENABLE_CODECOVERAGE)
     endif ( NOT CMAKE_BUILD_TYPE STREQUAL "Debug" )
 
     if ( NOT DEFINED CODECOV_OUTPUTFILE )
-        set( CODECOV_OUTPUTFILE cmake_coverage.output )
+        set( CODECOV_OUTPUTFILE coverage.info )
     endif ( NOT DEFINED CODECOV_OUTPUTFILE )
 
     if ( NOT DEFINED CODECOV_HTMLOUTPUTDIR )
