@@ -1,5 +1,6 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
+[![CircleCI](https://circleci.com/gh/RedisBloom/tdigest.svg?style=svg)](https://circleci.com/gh/RedisBloom/tdigest)
 [![codecov](https://codecov.io/gh/filipecosta90/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/filipecosta90/tdigest)
 # T-Digest
 
