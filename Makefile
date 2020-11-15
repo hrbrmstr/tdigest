@@ -14,6 +14,7 @@ ifndef CMAKE_LIBRARY_SHARED_OPTIONS
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=OFF \
 		-DENABLE_FRAME_POINTER=ON \
+		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
@@ -24,6 +25,7 @@ ifndef CMAKE_LIBRARY_STATIC_OPTIONS
 		-DBUILD_SHARED=OFF \
 		-DBUILD_STATIC=ON \
 		-DENABLE_FRAME_POINTER=ON \
+		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
@@ -34,6 +36,7 @@ ifndef CMAKE_LIBRARY_OPTIONS
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
 		-DENABLE_FRAME_POINTER=ON \
+		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
@@ -44,6 +47,7 @@ ifndef CMAKE_FULL_OPTIONS
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
 		-DENABLE_FRAME_POINTER=ON \
+		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=ON \
 		-DBUILD_BENCHMARK=ON \
 		-DBUILD_EXAMPLES=ON
@@ -99,7 +103,7 @@ lint:
 
 # build all
 full:
-	( mkdir -p build; cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
+	( mkdir -p build; cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 
 # static-analysis-docker:
 # 	$(MAKE) clean
@@ -110,5 +114,17 @@ clean: distclean
 distclean:
 	rm -rf build/* 
 
-bench: full
+bench: clean
+	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
 	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10
+
+perf-stat-bench:
+	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
+	$(SHOW) perf stat build/tests/histogram_benchmark --benchmark_min_time=10
+
+perf-record-bench:
+	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
+	$(SHOW) perf record -g -o perf.data.td_add build/tests/histogram_benchmark --benchmark_min_time=10
+
+perf-report-bench: 
+	$(SHOW) perf report -g -i perf.data.td_add
