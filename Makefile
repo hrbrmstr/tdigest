@@ -69,9 +69,20 @@ library_shared:
 library_all:
 	( cd build ; cmake $(CMAKE_LIBRARY_OPTIONS) .. ; $(MAKE) )
 
+# just build the static and shared libraries and produce measurements
+# of accuracy versus compression factor for fixed data size
+# TODO:
+
 # just build the static and shared libraries and tests
-unit_tests:
-	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) )
+unit_tests: 
+	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test )
+
+test:
+	$(MAKE) unit_tests
+
+coverage:
+	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test; make coverage; )
+	
 
 # build all
 full:

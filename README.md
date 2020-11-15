@@ -1,7 +1,8 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-[![CircleCI](https://circleci.com/gh/RedisBloom/tdigest.svg?style=svg)](https://circleci.com/gh/RedisBloom/tdigest)
-[![codecov](https://codecov.io/gh/filipecosta90/tdigest/branch/master/graph/badge.svg)](https://codecov.io/gh/filipecosta90/tdigest)
+[![CircleCI](https://circleci.com/gh/RedisBloom/t-digest-c.svg?style=svg)](https://circleci.com/gh/RedisBloom/t-digest-c)
+[![codecov](https://codecov.io/gh/RedisBloom/t-digest-c/branch/master/graph/badge.svg)](https://codecov.io/gh/RedisBloom/t-digest-c)
+
 # T-Digest
 
 Adaptive histogram based on something like streaming k-means crossed with Q-digest.
@@ -52,11 +53,19 @@ The following functions are implemented:
 
 ``` 
 # Build
-git clone https://github.com/filipecosta90/tdigest.git
-cd tdigest/
+git clone https://github.com/RedisBloom/t-digest-c.git
+cd t-digest-c/
 git submodule update --init --recursive
 make
 ```
+
+## Testing 
+Assuming you've followed the previous build steps, it should be as easy as:
+``` 
+# Run the unit tests
+make test
+```
+
 ## Benchmarking
 
 Assuming you've followed the previous build steps, it should be as easy as:

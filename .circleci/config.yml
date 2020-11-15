@@ -32,10 +32,22 @@ jobs:
           name: Build & Test
           command: |
             make clean
-            make unit_tests
-            cd build
-            make test ARGS="-V"
             make coverage
             bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
 
-          
+
+
+workflows:
+  commit:
+    jobs:
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
