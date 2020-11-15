@@ -127,4 +127,4 @@ perf-record-bench:
 	$(SHOW) perf record -g -o perf.data.td_add build/tests/histogram_benchmark --benchmark_min_time=10
 
 perf-report-bench: 
-	$(SHOW) perf report -g -i perf.data.td_add
+	$(SHOW) perf report -g 'graph,0.5,caller' -i perf.data.td_add
