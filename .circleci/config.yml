@@ -33,7 +33,7 @@ jobs:
           command: |
             make clean
             make coverage
-            bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
+            cd build && bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
 
 
 
