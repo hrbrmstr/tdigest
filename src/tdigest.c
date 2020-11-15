@@ -89,6 +89,9 @@ double td_cdf(td_histogram_t *h, double val) {
         }
         k += n->count;
     }
+    if (n == NULL) {
+        return NAN;
+    }
     if (val == n->mean) {
         // technically this needs to find all of the nodes which contain this value and sum their
         // weight
@@ -130,6 +133,9 @@ double td_quantile(td_histogram_t *h, double q) {
             break;
         }
         k += n->count;
+    }
+    if (n == NULL) {
+        return NAN;
     }
     double delta_k = goal - k - (n->count / 2);
     if (is_very_small(delta_k)) {

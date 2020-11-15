@@ -90,18 +90,20 @@ coverage:
 	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test; make coverage; )
 	
 format:
-	clang-format -style=file -i $(SRCDIR)/*
+	clang-format -style=file -i $(SRCDIR)/*.c
+	clang-format -style=file -i $(SRCDIR)/*.h
 
 lint:
-	clang-format -style=file -Werror -n $(SRCDIR)/*
+	clang-format -style=file -Werror -n $(SRCDIR)/*.c
+	clang-format -style=file -Werror -n $(SRCDIR)/*.h
 
 # build all
 full:
 	( cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
 
-static-analysis-docker:
-	$(MAKE) clean
-	docker run -v $(ROOT)/:/RedisBloom/ --user "$(username):$(usergroup)" $(INFER_DOCKER) bash -c "cd RedisBloom && CC=clang infer run --fail-on-issue --biabduction --skip-analysis-in-path ".*rmutil.*"  -- make"
+# static-analysis-docker:
+# 	$(MAKE) clean
+# 	docker run -v $(ROOT)/:/t-digest-c/ --user "$(username):$(usergroup)" $(INFER_DOCKER) bash -c "cd t-digest-c && CC=clang infer run --keep-going --fail-on-issue --biabduction -- make test"
 
 clean: distclean
 
