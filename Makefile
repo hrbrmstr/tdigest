@@ -3,6 +3,12 @@
 # Use CMAKE_LIBRARY_OPTIONS,CMAKE_LIBRARY_SHARED_OPTIONS,CMAKE_LIBRARY_STATIC_OPTIONS or CMAKE_FULL_OPTIONS argument to this Makefile to pass options to cmake.
 #----------------------------------------------------------------------------------------------------
 
+CC?=gcc
+INFER?=./deps/infer
+INFER_DOCKER?=redisbench/infer-linux64:1.0.0
+ROOT=$(shell pwd)
+SRCDIR := $(ROOT)/src
+
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS
 	CMAKE_LIBRARY_SHARED_OPTIONS=\
 		-DBUILD_SHARED=ON \
@@ -83,10 +89,19 @@ test:
 coverage:
 	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test; make coverage; )
 	
+format:
+	clang-format -style=file -i $(SRCDIR)/*
+
+lint:
+	clang-format -style=file -Werror -n $(SRCDIR)/*
 
 # build all
 full:
 	( cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
+
+static-analysis-docker:
+	$(MAKE) clean
+	docker run -v $(ROOT)/:/RedisBloom/ --user "$(username):$(usergroup)" $(INFER_DOCKER) bash -c "cd RedisBloom && CC=clang infer run --fail-on-issue --biabduction --skip-analysis-in-path ".*rmutil.*"  -- make"
 
 clean: distclean
 
