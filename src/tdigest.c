@@ -184,13 +184,15 @@ void td_add(td_histogram_t *h, double mean, double count) {
 static int compare_nodes(const void *v1, const void *v2) {
     node_t *n1 = (node_t *)(v1);
     node_t *n2 = (node_t *)(v2);
-    if (n1->mean < n2->mean) {
+    const double n1m = n1->mean;
+    const double n2m = n2->mean;
+    if (n1m < n2m) {
         return -1;
-    } else if (n1->mean > n2->mean) {
-        return 1;
-    } else {
-        return 0;
     }
+    if (n1m > n2m) {
+        return 1;
+    }
+    return 0;
 }
 
 void td_compress(td_histogram_t *h) {
