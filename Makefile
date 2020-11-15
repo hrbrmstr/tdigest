@@ -9,11 +9,11 @@ INFER_DOCKER?=redisbench/infer-linux64:1.0.0
 ROOT=$(shell pwd)
 SRCDIR := $(ROOT)/src
 
+
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS
 	CMAKE_LIBRARY_SHARED_OPTIONS=\
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=OFF \
-		-DENABLE_FRAME_POINTER=ON \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_BENCHMARK=OFF \
@@ -24,10 +24,8 @@ ifndef CMAKE_LIBRARY_STATIC_OPTIONS
 	CMAKE_LIBRARY_STATIC_OPTIONS=\
 		-DBUILD_SHARED=OFF \
 		-DBUILD_STATIC=ON \
-		-DENABLE_FRAME_POINTER=ON \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
 endif
 
@@ -35,10 +33,8 @@ ifndef CMAKE_LIBRARY_OPTIONS
 	CMAKE_LIBRARY_OPTIONS=\
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
-		-DENABLE_FRAME_POINTER=ON \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
 endif
 
@@ -46,11 +42,21 @@ ifndef CMAKE_FULL_OPTIONS
 	CMAKE_FULL_OPTIONS=\
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
-		-DENABLE_FRAME_POINTER=ON \
-		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=ON \
 		-DBUILD_BENCHMARK=ON \
 		-DBUILD_EXAMPLES=ON
+endif
+
+
+ifndef CMAKE_PROFILE_OPTIONS
+	CMAKE_PROFILE_OPTIONS=\
+		-DBUILD_SHARED=ON \
+		-DBUILD_STATIC=OFF \
+		-DENABLE_CODECOVERAGE=OFF \
+		-DBUILD_TESTS=ON \
+		-DBUILD_BENCHMARK=ON \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_PROFILE=ON
 endif
 
 
@@ -58,7 +64,6 @@ ifndef CMAKE_TEST_OPTIONS
 	CMAKE_TEST_OPTIONS=\
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
-		-DENABLE_FRAME_POINTER=ON \
 		-DBUILD_TESTS=ON \
 		-DENABLE_CODECOVERAGE=ON \
 		-DBUILD_BENCHMARK=OFF \
@@ -103,7 +108,7 @@ lint:
 
 # build all
 full:
-	( mkdir -p build; cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
+	( mkdir -p build; cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
 
 # static-analysis-docker:
 # 	$(MAKE) clean
@@ -115,16 +120,20 @@ distclean:
 	rm -rf build/* 
 
 bench: clean
-	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
+	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10
 
 perf-stat-bench:
-	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
+	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) perf stat build/tests/histogram_benchmark --benchmark_min_time=10
 
-perf-record-bench:
-	CFLAGS="-g -fno-omit-frame-pointer " CXXFLAGS="-g -fno-omit-frame-pointer " $(MAKE)
-	$(SHOW) perf record -g -o perf.data.td_add build/tests/histogram_benchmark --benchmark_min_time=10
+perf-record-bench: clean
+	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
+	$(SHOW) perf record -g -o perf.data.td_add \
+		build/tests/histogram_benchmark
 
-perf-report-bench: 
-	$(SHOW) perf report -g 'graph,0.5,caller' -i perf.data.td_add
+perf-report-bench:
+	$(SHOW) perf report -g "graph,0.5,caller" -i perf.data.td_add
+
+perf-report-bench-pprof:
+	go tool pprof -web perf.data.td_add
