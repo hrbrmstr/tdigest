@@ -65,15 +65,15 @@ default: full
 
 # just build the static library. Do not build tests or benchmarks
 library_static:
-	( cd build ; cmake $(CMAKE_LIBRARY_STATIC_OPTIONS) .. ; $(MAKE) )
+	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_STATIC_OPTIONS) .. ; $(MAKE) )
 
 # just build the shared library. Do not build tests or benchmarks
 library_shared:
-	( cd build ; cmake $(CMAKE_LIBRARY_SHARED_OPTIONS) .. ; $(MAKE) )
+	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_SHARED_OPTIONS) .. ; $(MAKE) )
 
 # just build the static and shared libraries. Do not build tests or benchmarks
 library_all:
-	( cd build ; cmake $(CMAKE_LIBRARY_OPTIONS) .. ; $(MAKE) )
+	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_OPTIONS) .. ; $(MAKE) )
 
 # just build the static and shared libraries and produce measurements
 # of accuracy versus compression factor for fixed data size
@@ -81,13 +81,13 @@ library_all:
 
 # just build the static and shared libraries and tests
 unit_tests: 
-	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test )
+	( mkdir -p build; cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test )
 
 test:
 	$(MAKE) unit_tests
 
 coverage:
-	( cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test; make coverage; )
+	( mkdir -p build; cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test; make coverage; )
 	
 format:
 	clang-format -style=file -i $(SRCDIR)/*.c
@@ -99,7 +99,7 @@ lint:
 
 # build all
 full:
-	( cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
+	( mkdir -p build; cd build ; cmake $(CMAKE_FULL_OPTIONS) .. ; $(MAKE) )
 
 # static-analysis-docker:
 # 	$(MAKE) clean
