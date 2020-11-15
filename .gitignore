@@ -17,6 +17,13 @@ build/*
 .vscode
 tests/vendor/*
 
+# perf related
+perf.data*
+
+
+# fb infer static analysis
+infer-out/*
+
 # Prerequisites
 *.d
 

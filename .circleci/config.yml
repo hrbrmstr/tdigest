@@ -2,6 +2,28 @@
 version: 2.1
 
 jobs:
+  lint:
+    docker:
+      - image: redislabsmodules/llvm-toolset:latest
+    steps:
+      - checkout
+      - run:
+          name: lint
+          command: |
+            make lint
+
+  static-analysis-infer:
+    docker:
+      - image: redisbench/infer-linux64:1.0.0
+    steps:
+      - checkout
+      - run:
+          name: Submodule checkout
+          command: git submodule update --init --recursive
+      - run:
+          name: run fbinfer
+          command: |
+            CC=clang CXX=clang++ INFER=infer make static-analysis
   build:
     docker:
       - image: "debian:stretch"
@@ -32,10 +54,23 @@ jobs:
           name: Build & Test
           command: |
             make clean
-            make unit_tests
-            cd build
-            make test ARGS="-V"
             make coverage
-            bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
+            cd build && bash <(curl -s https://codecov.io/bash) -f coverage.info -X gcov -x gcov-7 || echo "Codecov did not collect coverage reports"
 
-          
+
+
+workflows:
+  commit:
+    jobs:
+      - lint 
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
