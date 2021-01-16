@@ -119,6 +119,9 @@ clean: distclean
 distclean:
 	rm -rf build/* 
 
+profile: clean
+	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 2> $(basename $@).compiler_stedrr_output.txt )
+
 bench: clean
 	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10

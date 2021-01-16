@@ -43,11 +43,26 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 if(ENABLE_PROFILE)
   message(STATUS "Enabling profile flags.")
   string (REPLACE "-DNDEBUG" "" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-  string (REPLACE "-O3" "" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-  string (REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
   string (REPLACE "-DNDEBUG" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -g -ggdb -fno-omit-frame-pointer")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2  -g -ggdb -fno-omit-frame-pointer")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -ggdb -fno-omit-frame-pointer")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -ggdb -fno-omit-frame-pointer")
+  # enable vectorization report flags
+  # using Clang
+  if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")
+
+  # using GCC
+  elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ftree-vectorize -fopt-info-vec-all")
+
+  # using Intel C++
+  elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -qopt-report=5 -qopt-report-phase=vec")
+
+  # using Visual Studio C++
+  elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+  # TBD
+  endif()
 endif(ENABLE_PROFILE)
 
 # --- System Libraries ---
