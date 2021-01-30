@@ -6,6 +6,7 @@
  * The implementation is a direct descendent of MergingDigest
  * https://github.com/tdunning/t-digest/
  *
+ * Copyright (c) 2021 Redis Labs, All rights reserved.
  * Copyright (c) 2018 Andrew Werner, All rights reserved.
  *
  * The special characteristics of this algorithm are:
