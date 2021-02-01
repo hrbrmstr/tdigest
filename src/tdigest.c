@@ -4,6 +4,12 @@
 #include <math.h>
 #include "tdigest.h"
 
+#ifndef TD_MALLOC_INCLUDE
+#define TD_MALLOC_INCLUDE "td_malloc.h"
+#endif
+
+#include TD_MALLOC_INCLUDE
+
 void bbzero(void *to, size_t count) { memset(to, 0, count); }
 
 static bool is_very_small(double val) { return !(val > .000000001 || val < -.000000001); }
@@ -56,10 +62,10 @@ static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
 
 td_histogram_t *td_new(double compression) {
     size_t memsize = td_required_buf_size(compression);
-    return td_init(compression, memsize, (char *)(malloc(memsize)));
+    return td_init(compression, memsize, (char *)(__td_malloc(memsize)));
 }
 
-void td_free(td_histogram_t *h) { free((void *)(h)); }
+void td_free(td_histogram_t *h) { __td_free((void *)(h)); }
 
 void td_merge(td_histogram_t *into, td_histogram_t *from) {
     td_compress(into);
