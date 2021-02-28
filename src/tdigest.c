@@ -36,23 +36,15 @@ static size_t td_required_buf_size(double compression) {
 
 int td_init(double compression, td_histogram_t **result) {
     size_t buf_size = td_required_buf_size(compression);
-    td_histogram_t *h = (td_histogram_t *)((char *)(__td_malloc(buf_size)));
-    if (!h) {
-        return NULL;
+    td_histogram_t *histogram = (td_histogram_t *)((char *)(__td_malloc(buf_size)));
+    if (!histogram) {
+        return 1;
     }
-    bbzero((void *)(h), buf_size);
-    *h = (td_histogram_t){
-        .compression = compression,
-        .cap = (buf_size - sizeof(td_histogram_t)) / sizeof(node_t),
-        .min = __DBL_MAX__,
-        .max = __DBL_MIN__,
-        .total_compressions = 0,
-        .merged_nodes = 0,
-        .merged_weight = 0,
-        .unmerged_nodes = 0,
-        .unmerged_weight = 0,
-    };
-    *result = h;
+    bbzero((void *)(histogram), buf_size);
+    histogram->cap = (buf_size - sizeof(td_histogram_t)) / sizeof(node_t);
+    histogram->compression = compression;
+    td_reset(histogram);
+    *result = histogram;
     return 0;
 }
 
@@ -74,6 +66,19 @@ void td_merge(td_histogram_t *into, td_histogram_t *from) {
 }
 
 int td_centroid_count(td_histogram_t *h) { return next_node(h); }
+
+void td_reset(td_histogram_t *h) {
+    if (h == NULL) {
+        return;
+    }
+    h->min = __DBL_MAX__;
+    h->max = __DBL_MIN__;
+    h->merged_nodes = 0;
+    h->merged_weight = 0;
+    h->unmerged_nodes = 0;
+    h->unmerged_weight = 0;
+    h->total_compressions = 0;
+}
 
 double td_size(td_histogram_t *h) { return h->merged_weight + h->unmerged_weight; }
 
