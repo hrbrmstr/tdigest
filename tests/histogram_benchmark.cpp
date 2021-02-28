@@ -92,8 +92,75 @@ static void BM_td_add_lognormal_dist(benchmark::State &state)
     }
 }
 
+
+static void BM_td_quantile_lognormal_dist(benchmark::State &state)
+{
+    const double compression = state.range(0);
+    const int64_t stream_size = state.range(1);
+    td_histogram_t *mdigest = td_new(compression);
+    std::vector<double> input;
+    input.resize(stream_size, 0);
+    std::mt19937_64 rng;
+    rng.seed(std::random_device()());
+    std::uniform_real_distribution<double> dist(0, 1);
+    std::lognormal_distribution<double> distSamples(1,0.5);
+
+    for (double &i : input)
+    {
+        i = dist(rng);
+        td_add(mdigest, distSamples(rng), 1);
+    }
+    td_compress(mdigest);
+
+    while (state.KeepRunning())
+    {
+        for (int i = 0; i < stream_size; ++i)
+        {
+            td_quantile(mdigest, input[i]);
+        }
+        // read/write barrier
+        benchmark::ClobberMemory();
+        state.SetItemsProcessed(stream_size);
+   }
+}
+
+static void BM_td_merge_lognormal_dist(benchmark::State &state)
+{
+    const double compression = state.range(0);
+    const int64_t stream_size = 100000;
+    td_histogram_t *mdigest = td_new(compression);
+        td_histogram_t *mdigest2 = td_new(compression);
+    std::vector<double> input;
+    input.resize(stream_size, 0);
+    std::mt19937_64 rng;
+    rng.seed(std::random_device()());
+    std::uniform_real_distribution<double> dist(0, 1);
+    std::lognormal_distribution<double> distSamples(1,0.5);
+
+    for (double &i : input)
+    {
+        i = dist(rng);
+        td_add(mdigest, distSamples(rng), 1);
+        td_add(mdigest2, distSamples(rng), 1);
+    }
+    td_compress(mdigest);
+
+    while (state.KeepRunning())
+    {
+        for (int i = 0; i < stream_size; ++i)
+        {
+            td_merge(mdigest,mdigest2);
+        }
+        // read/write barrier
+        benchmark::ClobberMemory();
+        state.SetItemsProcessed(stream_size);
+   }
+}
+
 // Register the functions as a benchmark
 BENCHMARK(BM_td_add_uniform_dist)->Apply(generate_arguments_pairs);
 BENCHMARK(BM_td_add_lognormal_dist)->Apply(generate_arguments_pairs);
+BENCHMARK(BM_td_quantile_lognormal_dist)->Apply(generate_arguments_pairs);
+BENCHMARK(BM_td_merge_lognormal_dist)->Apply(generate_arguments_pairs);
 
 BENCHMARK_MAIN();
