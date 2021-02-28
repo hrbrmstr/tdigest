@@ -8,6 +8,7 @@ INFER?=./deps/infer
 INFER_DOCKER?=redisbench/infer-linux64:1.0.0
 ROOT=$(shell pwd)
 SRCDIR := $(ROOT)/src
+TESTDIR := $(ROOT)/tests
 
 
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS
@@ -101,10 +102,14 @@ coverage:
 format:
 	clang-format -style=file -i $(SRCDIR)/*.c
 	clang-format -style=file -i $(SRCDIR)/*.h
+	clang-format -style=file -i $(TESTDIR)/*.c
+	clang-format -style=file -i $(TESTDIR)/*.h
 
 lint:
 	clang-format -style=file -Werror -n $(SRCDIR)/*.c
 	clang-format -style=file -Werror -n $(SRCDIR)/*.h
+	clang-format -style=file -Werror -n $(TESTDIR)/*.c
+	clang-format -style=file -Werror -n $(TESTDIR)/*.h
 
 # build all
 full:
