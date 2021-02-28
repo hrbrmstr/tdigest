@@ -72,7 +72,7 @@ include(UseCodeCoverage)
 include(GNUInstallDirs)
 
 # --- Build directories ---
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
+add_subdirectory("src")
 
 # --- Documentation ---
 # TODO 
@@ -81,10 +81,10 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 ENABLE_TESTING()
 
 if(BUILD_TESTS)
-  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tests")
+  add_subdirectory("tests")
 endif(BUILD_TESTS)
 
 # --- Examples ---
 if(BUILD_EXAMPLES)
-  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/examples")
+  add_subdirectory("examples")
 endif(BUILD_EXAMPLES)
