@@ -71,6 +71,19 @@ extern "C" {
 td_histogram_t *td_new(double compression);
 
 /**
+ * Allocate the memory and initialise the t-digest.
+ *
+ * @param compression The compression parameter.
+ * 100 is a common value for normal uses.
+ * 1000 is extremely large.
+ * The number of centroids retained will be a smallish (usually less than 10) multiple of this
+ * number.
+ * @param result Output parameter to capture allocated histogram.
+ * @return 0 on success, 1 if allocation failed.
+ */
+int td_init(double compression, td_histogram_t **result);
+
+/**
  * Frees the memory associated with the t-digest.
  *
  * @param h The histogram you want to free.
