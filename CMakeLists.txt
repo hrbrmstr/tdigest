@@ -28,6 +28,16 @@ IF(NOT CMAKE_BUILD_TYPE)
             "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
+
+if(ENABLE_SANITIZERS)
+  message(STATUS "Forcing build type to Debug to run coverage.")
+      set(CMAKE_BUILD_TYPE "Debug" CACHE
+              STRING "Choose the type of build." FORCE)
+      set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+      set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+ENDIF()
+
 if(ENABLE_CODECOVERAGE)
   message(STATUS "Forcing build type to Debug to run coverage.")
       set(CMAKE_BUILD_TYPE "Debug" CACHE
