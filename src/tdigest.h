@@ -25,11 +25,6 @@
 
 #define MM_PI 3.14159265358979323846
 
-typedef struct node {
-    double mean;
-    double count;
-} node_t;
-
 struct td_histogram {
     // compression is a setting used to configure the size of centroids when merged.
     double compression;
@@ -50,7 +45,8 @@ struct td_histogram {
     double merged_weight;
     double unmerged_weight;
 
-    node_t nodes[];
+    double *nodes_mean;
+    double *nodes_weight;
 };
 
 typedef struct td_histogram td_histogram_t;
