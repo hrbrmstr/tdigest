@@ -20,6 +20,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// clang-format off
 #ifndef MINUNIT_MINUNIT_H
 #define MINUNIT_MINUNIT_H
 
@@ -383,3 +384,4 @@ static double mu_timer_cpu(void) {
 #endif
 
 #endif /* MINUNIT_MINUNIT_H */
+// clang-format on
