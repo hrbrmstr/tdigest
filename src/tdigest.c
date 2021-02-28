@@ -12,9 +12,9 @@
 
 void bbzero(void *to, size_t count) { memset(to, 0, count); }
 
-static bool is_very_small(double val) { return !(val > .000000001 || val < -.000000001); }
+static inline bool is_very_small(double val) { return !(val > .000000001 || val < -.000000001); }
 
-static int cap_from_compression(double compression) { return (6 * (int)(compression)) + 10; }
+static inline int cap_from_compression(double compression) { return (6 * (int)(compression)) + 10; }
 
 static bool should_td_compress(td_histogram_t *h) {
     return ((h->merged_nodes + h->unmerged_nodes) == h->cap);
@@ -34,14 +34,9 @@ static size_t td_required_buf_size(double compression) {
     return sizeof(td_histogram_t) + (cap_from_compression(compression) * sizeof(node_t));
 }
 
-// td_init will initialize a td_histogram_t inside buf which is buf_size bytes.
-// If buf_size is too small (smaller than compression + 1) or buf is NULL,
-// the returned pointer will be NULL.
-//
-// In general use td_required_buf_size to figure out what size buffer to
-// pass.
-static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
-    td_histogram_t *h = (td_histogram_t *)(buf);
+int td_init(double compression, td_histogram_t **result) {
+    size_t buf_size = td_required_buf_size(compression);
+    td_histogram_t *h = (td_histogram_t *)((char *)(__td_malloc(buf_size)));
     if (!h) {
         return NULL;
     }
@@ -57,12 +52,14 @@ static td_histogram_t *td_init(double compression, size_t buf_size, char *buf) {
         .unmerged_nodes = 0,
         .unmerged_weight = 0,
     };
-    return h;
+    *result = h;
+    return 0;
 }
 
 td_histogram_t *td_new(double compression) {
-    size_t memsize = td_required_buf_size(compression);
-    return td_init(compression, memsize, (char *)(__td_malloc(memsize)));
+    td_histogram_t *mdigest = NULL;
+    td_init(compression, &mdigest);
+    return mdigest;
 }
 
 void td_free(td_histogram_t *h) { __td_free((void *)(h)); }

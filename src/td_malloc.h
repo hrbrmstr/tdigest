@@ -15,6 +15,7 @@
 #ifndef TD_ALLOC_H
 #define TD_ALLOC_H
 #define __td_malloc malloc
+#define __td_calloc calloc
 #define __td_realloc realloc
 #define __td_free free
 #endif
