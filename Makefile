@@ -61,6 +61,18 @@ ifndef CMAKE_PROFILE_OPTIONS
 endif
 
 
+ifndef CMAKE_SANITIZE_OPTIONS
+	CMAKE_SANITIZE_OPTIONS=\
+		-DBUILD_SHARED=ON \
+		-DBUILD_STATIC=OFF \
+		-DENABLE_CODECOVERAGE=OFF \
+		-DBUILD_TESTS=ON \
+		-DBUILD_BENCHMARK=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_PROFILE=OFF \
+		-DENABLE_SANITIZERS=ON
+endif
+
 ifndef CMAKE_TEST_OPTIONS
 	CMAKE_TEST_OPTIONS=\
 		-DBUILD_SHARED=ON \
@@ -123,6 +135,10 @@ clean: distclean
 
 distclean:
 	rm -rf build/* 
+
+sanitize: clean
+	( mkdir -p build; cd build ; cmake $(CMAKE_SANITIZE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
+	$(SHOW) build/tests/td_test
 
 profile: clean
 	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 2> $(basename $@).compiler_stedrr_output.txt )

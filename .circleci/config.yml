@@ -12,6 +12,22 @@ jobs:
           command: |
             make lint
 
+  sanitize:
+    docker:
+      - image: redislabsmodules/llvm-toolset:latest
+    steps:
+      - checkout
+      - run:
+          name: Install CMAKE
+          command: 'apt install -y cmake'
+      - run:
+          name: Pull Submodules
+          command: git submodule update --init --recursive
+      - run:
+          name: Build & Test with sanitizers
+          command: |
+            make sanitize
+
   static-analysis-infer:
     docker:
       - image: redisbench/infer-linux64:1.0.0
@@ -64,6 +80,7 @@ workflows:
     jobs:
       - lint 
       - build
+      - sanitize
   nightly:
     triggers:
       - schedule:
