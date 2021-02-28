@@ -16,7 +16,41 @@
 
 #define STREAM_SIZE 1000000
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 static double randfrom(double M, double N) { return M + (rand() / (RAND_MAX / (N - M))); }
+
+/**
+ * Reference implementations for cdf if we have all data.
+ */
+static double dist_cdf(double x, double *data, int data_length) {
+    double n1 = 0;
+    double n2 = 0;
+    for (size_t i = 0; i < data_length; i++) {
+        const double v = data[i];
+        n1 += (v < x) ? 1 : 0;
+        n2 += (v == x) ? 1 : 0;
+    }
+    return (n1 + n2 / 2.0) / data_length;
+}
+
+/**
+ * Reference implementations for quantile if we have all data.
+ */
+static double dist_quantile(double q, double *data, int data_length) {
+    if (data_length == 0) {
+        return NAN;
+    }
+    double index = q * data_length;
+    if (index < 0) {
+        index = 0;
+    }
+    if (index > data_length - 1) {
+        index = data_length - 1;
+    }
+    return data[(int)floor(index)];
+}
 
 int tests_run = 0;
 
@@ -55,8 +89,27 @@ MU_TEST(test_basic) {
     mu_assert(td_compression(t) < t->cap, "False: buffer size < compression");
     mu_assert_double_eq(0.0, td_quantile(t, .0));
     mu_assert_double_eq(0.0, td_quantile(t, .1));
-    // mu_assert_double_eq(10.0, td_quantile(t, .5));
     mu_assert_double_eq(10.0, td_quantile(t, .99));
+    td_reset(t);
+    td_reset(NULL);
+    td_free(t);
+}
+
+MU_TEST(test_quantile_interpolations) {
+    td_histogram_t *t = td_new(10);
+    mu_assert(t != NULL, "created_histogram");
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(0, t->merged_weight);
+    td_add(t, 5.0, 2);
+    mu_assert_double_eq(1, t->unmerged_weight);
+    // with one data point, all quantiles lead to Rome
+    mu_assert_double_eq(0.0, td_quantile(t, .0));
+    mu_assert_double_eq(0.0, td_quantile(t, 0.5));
+    td_compress(t);
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(2.0, t->merged_weight);
+    td_add(t, 100.0, 1);
+    // we know that there are at least two centroids now
     td_free(t);
 }
 
@@ -187,19 +240,61 @@ MU_TEST(test_two_interp) {
     td_add(t, 1, 1);
     td_add(t, 10, 1);
     mu_assert(isfinite(td_quantile(t, .9)), "test_two_interp: value at .9");
+    td_reset(t);
+    // if the left centroid has more than one sample, we still know
+    // that one sample occurred at min so we can do some interpolation
+    td_add(t, 1, 10);
+    td_add(t, 10, 1);
+    mu_assert_double_eq(1.0, td_quantile(t, .1));
+    td_reset(t);
+    // if the right-most centroid has more than one sample, we still know
+    // that one sample occurred at max so we can do some interpolation
+    td_add(t, 1, 1);
+    td_add(t, 10, 10);
+    mu_assert_double_eq(10.0, td_quantile(t, .9));
+    td_reset(t);
+    // in between extremes we interpolate between centroids
+    td_add(t, 1, 1);
+    td_add(t, 5, 1);
+    td_add(t, 10, 1);
+    // centroids i and i+1 bracket our current point
+    // check for unit weight
+    // within the singleton's sphere
+    // left
+    mu_assert_double_eq(5.0, td_quantile(t, .5));
+    td_reset(t);
+    // in between extremes we interpolate between centroids
+    td_add(t, 1, 1);  // q0
+    td_add(t, 4, 1);  // q20
+    td_add(t, 8, 1);  // q40
+    td_add(t, 12, 1); // q60
+    td_add(t, 16, 1); // q80
+    td_add(t, 20, 1); // q100
+    // centroids i and i+1 bracket our current point
+    // check for unit weight
+    // within the singleton's sphere
+    // TODO: check for right
+    // mu_assert_double_eq(4.0, td_quantile(t, .20) );
+    // mu_assert_double_eq(8.0, td_quantile(t, .40) );
+    // mu_assert_double_eq(12.0, td_quantile(t, .60) );
+    // mu_assert_double_eq(7.0, td_quantile(t, .70) );
+    // mu_assert_double_eq(8.0, td_quantile(t, .75) );
     td_free(t);
 }
 
 MU_TEST(test_cdf) {
     td_histogram_t *t = td_new(100);
+    mu_assert(isnan(td_cdf(t, 1.1)), "no data to examine");
+    // interpolate if somehow we have weight > 0 and max != min
     td_add(t, 1, 1);
+    // bellow lower bound
     mu_assert_double_eq(0, td_cdf(t, 0));
     // exactly one centroid, should have max==min
     // min and max are too close together to do any viable interpolation
     mu_assert_double_eq(0.5, td_cdf(t, 1));
+    // above upper bound
+    mu_assert_double_eq(1.0, td_cdf(t, 2));
     td_add(t, 10, 1);
-    mu_assert_double_eq(0, td_cdf(t, .99));
-    mu_assert_double_eq(1, td_cdf(t, 10.01));
     mu_assert_double_eq(.25, td_cdf(t, 1));
     mu_assert_double_eq(.5, td_cdf(t, 5.5));
     // // TODO: fix this
