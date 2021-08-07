@@ -42,6 +42,9 @@ if(ENABLE_CODECOVERAGE)
   message(STATUS "Forcing build type to Debug to run coverage.")
       set(CMAKE_BUILD_TYPE "Debug" CACHE
               STRING "Choose the type of build." FORCE)
+  # --- System Libraries ---
+  include(GNUInstallDirs)
+  include(UseCodeCoverage)
 ENDIF()
 
 # Generate position-independent code (-fPIC on UNIX)
@@ -74,12 +77,6 @@ if(ENABLE_PROFILE)
   # TBD
   endif()
 endif(ENABLE_PROFILE)
-
-# --- System Libraries ---
-include(GNUInstallDirs)
-include(UseCodeCoverage)
-
-include(GNUInstallDirs)
 
 # --- Build directories ---
 add_subdirectory("src")
