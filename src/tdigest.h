@@ -173,7 +173,7 @@ int td_centroid_count(td_histogram_t *h);
 double td_min(td_histogram_t *h);
 
 /**
- * Get maximum value from the histogram.  Will return __DBL_MIN__ if the histogram
+ * Get maximum value from the histogram.  Will return - __DBL_MAX__ if the histogram
  * is empty.
  *
  * @param h "This" pointer
