@@ -50,8 +50,8 @@ ENDIF()
 # Generate position-independent code (-fPIC on UNIX)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -std=c99")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c99")
 
 if(ENABLE_PROFILE)
   message(STATUS "Enabling profile flags.")
@@ -82,7 +82,7 @@ endif(ENABLE_PROFILE)
 add_subdirectory("src")
 
 # --- Documentation ---
-# TODO 
+# TODO
 
 # --- Unit Tests ---
 ENABLE_TESTING()
