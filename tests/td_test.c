@@ -113,6 +113,108 @@ MU_TEST(test_quantile_interpolations) {
     td_free(t);
 }
 
+MU_TEST(test_trimmed_mean_simple) {
+    /* Used numpy to check results validity
+     import numpy as np
+     from scipy import stats
+     x = [5,5,5,10,15,15,15]
+     np.mean(x)
+     10.0
+     stats.trim_mean(x, 0.0)
+     10.0
+     */
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(0, t->merged_weight);
+    td_add(t, 5.0, 1);
+    // with one data point, all quantiles lead to Rome
+    // stats.trim_mean(x, 0.49)
+    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .49));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.49, 0.51));
+    // stats.trim_mean(x, 0.1)
+    // 5.0
+    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .1));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.1, 0.9));
+    // 5.0
+    // stats.trim_mean(x, 0.0)
+    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
+    // 5.0
+    td_add(t, 5.0, 2);
+    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
+    td_add(t, 10.0, 1);
+    td_add(t, 15.0, 3);
+    //    stats.trim_mean(x, 0.0)
+    //    10.0
+    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(10, td_trimmed_mean(t, 0.0, 1.0));
+    // trimmed mean and mean should lead to 10 in here
+    //    stats.trim_mean(x, 0.1)
+    //    10.0
+    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .1));
+    mu_assert_double_eq(10, td_trimmed_mean(t, .1, .9));
+    // trimmed mean and mean should lead to 10 in here
+    //    stats.trim_mean(x, 0.25)
+    //    10.0
+    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .25));
+    mu_assert_double_eq(10, td_trimmed_mean(t, .25, .75));
+    td_free(t);
+}
+
+MU_TEST(test_trimmed_mean_complex) {
+    /* Used numpy to check results validity
+     import numpy as np
+     from scipy import stats
+     x = np.arange(20)
+     stats.trim_mean(x, 0.1)
+     9.5
+     */
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(0, t->merged_weight);
+    for (int i = 0; i < 20; ++i) {
+        td_add(t, (double)i, 1);
+    }
+    // trimmed mean and mean should lead to 9.5 in here
+    //    stats.trim_mean(x, 0.25)
+    //    9.5
+    mu_assert_double_eq(9.5, td_trimmed_mean_symetric(t, .25));
+    mu_assert_double_eq(9.5, td_trimmed_mean(t, .25, .75));
+    td_free(t);
+    t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(0, t->merged_weight);
+    for (int i = 0; i < 200; ++i) {
+        td_add(t, (double)i, 1);
+    }
+    // trimmed mean and mean should lead to 99.5 in here
+    //    x = np.arange(200)
+    //    stats.trim_mean(x, 0.25)
+    //    99.5
+    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean_symetric(t, .25), 0.1);;
+    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean(t, .25, .75), 0.1);;
+    td_free(t);
+    //    x = [1,2,3,4,5,6,7,8,9,10,100,100,100]
+    t = td_new(100);
+    for (int i = 1; i < 11; ++i) {
+        td_add(t, (double)i, 1);
+    }
+    td_add(t, 100, 3);
+    //    stats.trim_mean(x, 0.1)
+    //    23.09090909090909
+    mu_assert_double_eq_epsilon(23.09090909090909, td_trimmed_mean_symetric(t, .1), 0.01);
+    mu_assert_double_eq_epsilon(23.09090909090909, td_trimmed_mean(t, .1, .9), 0.01);
+    //    stats.trim_mean(x, 0.25)
+    //    7.0
+    mu_assert_double_eq_epsilon(7.0, td_trimmed_mean_symetric(t, .25), 0.01);
+    mu_assert_double_eq_epsilon(7.0, td_trimmed_mean(t, .25, .75), 0.01);
+    td_free(t);
+}
+
 MU_TEST(test_compress_small) {
     td_histogram_t *t = td_new(100);
     mu_assert(t != NULL, "created_histogram");
@@ -349,6 +451,8 @@ MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_td_max);
     MU_RUN_TEST(test_td_min);
     MU_RUN_TEST(test_quantiles);
+    MU_RUN_TEST(test_trimmed_mean_simple);
+    MU_RUN_TEST(test_trimmed_mean_complex);
 }
 
 int main(int argc, char *argv[]) {

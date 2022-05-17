@@ -10,12 +10,12 @@
 
 #include TD_MALLOC_INCLUDE
 
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define __td_max(x, y) (((x) > (y)) ? (x) : (y))
+#define __td_min(x, y) (((x) < (y)) ? (x) : (y))
 
 static inline double weighted_average_sorted(double x1, double w1, double x2, double w2) {
     const double x = (x1 * w1 + x2 * w2) / (w1 + w2);
-    return MAX(x1, MIN(x, x2));
+    return __td_max(x1, __td_min(x, x2));
 }
 
 static inline double weighted_average(double x1, double w1, double x2, double w2) {
@@ -369,6 +369,76 @@ double td_quantile(td_histogram_t *h, double q) {
     const double z1 = index - h->merged_weight - right_centroid_weight / 2.0;
     const double z2 = right_centroid_weight / 2 - z1;
     return weighted_average(h->nodes_mean[n - 1], z1, h->max, z2);
+}
+
+static double td_internal_trimmed_mean(const td_histogram_t *h, const double leftmost_weight,
+                                       const double rightmost_weight) {
+    double count_done = 0;
+    double trimmed_sum = 0;
+    double trimmed_count = 0;
+    for (int i = 0; i < h->merged_nodes; i++) {
+
+        const double n_weight = h->nodes_weight[i];
+        // Assume the whole centroid falls into the range
+        double count_add = n_weight;
+
+        // If we haven't reached the low threshold yet, skip appropriate part of the centroid.
+        count_add -= __td_min(__td_max(0, leftmost_weight - count_done), count_add);
+
+        // If we have reached the upper threshold, ignore the overflowing part of the centroid.
+
+        count_add = __td_min(__td_max(0, rightmost_weight - count_done), count_add);
+
+        // consider the whole centroid processed
+        count_done += n_weight;
+
+        // increment the sum / count
+        trimmed_sum += h->nodes_mean[i] * count_add;
+        trimmed_count += count_add;
+
+        // break once we cross the high threshold
+        if (count_done >= rightmost_weight)
+            break;
+    }
+
+    return trimmed_sum / trimmed_count;
+}
+
+double td_trimmed_mean_symetric(td_histogram_t *h, double proportion_to_cut) {
+    td_compress(h);
+    // proportion_to_cut should be in [0,1]
+    if (h->merged_nodes == 0 || proportion_to_cut < 0.0 || proportion_to_cut > 1.0) {
+        return NAN;
+    }
+    // with one data point, all values lead to Rome
+    if (h->merged_nodes == 1) {
+        return h->nodes_mean[0];
+    }
+
+    /* translate the percentiles to counts */
+    const double leftmost_weight = floor(h->merged_weight * proportion_to_cut);
+    const double rightmost_weight = ceil(h->merged_weight * (1.0 - proportion_to_cut));
+
+    return td_internal_trimmed_mean(h, leftmost_weight, rightmost_weight);
+}
+
+double td_trimmed_mean(td_histogram_t *h, double leftmost_cut, double rightmost_cut) {
+    td_compress(h);
+    // leftmost_cut and rightmost_cut should be in [0,1]
+    if (h->merged_nodes == 0 || leftmost_cut < 0.0 || leftmost_cut > 1.0 || rightmost_cut < 0.0 ||
+        rightmost_cut > 1.0) {
+        return NAN;
+    }
+    // with one data point, all values lead to Rome
+    if (h->merged_nodes == 1) {
+        return h->nodes_mean[0];
+    }
+
+    /* translate the percentiles to counts */
+    const double leftmost_weight = floor(h->merged_weight * leftmost_cut);
+    const double rightmost_weight = ceil(h->merged_weight * rightmost_cut);
+
+    return td_internal_trimmed_mean(h, leftmost_weight, rightmost_weight);
 }
 
 void td_add(td_histogram_t *h, double mean, double weight) {

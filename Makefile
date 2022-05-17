@@ -103,7 +103,7 @@ library_all:
 
 # just build the static and shared libraries and tests
 unit_tests: 
-	( mkdir -p build; cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test )
+	( mkdir -p build; cd build ; cmake $(CMAKE_TEST_OPTIONS) .. ; $(MAKE) ; $(MAKE) test)
 
 test:
 	$(MAKE) unit_tests

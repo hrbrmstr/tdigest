@@ -8,6 +8,7 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
+cmake-build-debug
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -76,3 +77,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# IDE
+.idea
