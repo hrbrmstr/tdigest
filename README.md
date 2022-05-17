@@ -48,6 +48,8 @@ The following functions are implemented:
   - `td_centroid_count`: Return the number of centroids being used by the t-Digest
   - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty
   - `td_max`: Get the maximum value from the histogram.  Will return __DBL_MIN__ if the histogram is empty
+  - `td_trimmed_mean`: Returns the trimmed mean ignoring values outside given cutoff upper and lower limits
+  - `td_trimmed_mean_symmetric`: Returns the trimmed mean ignoring values outside given a symmetric cutoff limits
 
 ## Build notes
 

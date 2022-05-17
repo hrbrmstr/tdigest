@@ -404,7 +404,7 @@ static double td_internal_trimmed_mean(const td_histogram_t *h, const double lef
     return trimmed_sum / trimmed_count;
 }
 
-double td_trimmed_mean_symetric(td_histogram_t *h, double proportion_to_cut) {
+double td_trimmed_mean_symmetric(td_histogram_t *h, double proportion_to_cut) {
     td_compress(h);
     // proportion_to_cut should be in [0,1]
     if (h->merged_nodes == 0 || proportion_to_cut < 0.0 || proportion_to_cut > 1.0) {

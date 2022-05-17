@@ -130,35 +130,35 @@ MU_TEST(test_trimmed_mean_simple) {
     td_add(t, 5.0, 1);
     // with one data point, all quantiles lead to Rome
     // stats.trim_mean(x, 0.49)
-    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .49));
+    mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .49));
     mu_assert_double_eq(5, td_trimmed_mean(t, 0.49, 0.51));
     // stats.trim_mean(x, 0.1)
     // 5.0
-    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .1));
+    mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .1));
     mu_assert_double_eq(5, td_trimmed_mean(t, 0.1, 0.9));
     // 5.0
     // stats.trim_mean(x, 0.0)
-    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .0));
     mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
     // 5.0
     td_add(t, 5.0, 2);
-    mu_assert_double_eq(5, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .0));
     mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
     td_add(t, 10.0, 1);
     td_add(t, 15.0, 3);
     //    stats.trim_mean(x, 0.0)
     //    10.0
-    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .0));
+    mu_assert_double_eq(10, td_trimmed_mean_symmetric(t, .0));
     mu_assert_double_eq(10, td_trimmed_mean(t, 0.0, 1.0));
     // trimmed mean and mean should lead to 10 in here
     //    stats.trim_mean(x, 0.1)
     //    10.0
-    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .1));
+    mu_assert_double_eq(10, td_trimmed_mean_symmetric(t, .1));
     mu_assert_double_eq(10, td_trimmed_mean(t, .1, .9));
     // trimmed mean and mean should lead to 10 in here
     //    stats.trim_mean(x, 0.25)
     //    10.0
-    mu_assert_double_eq(10, td_trimmed_mean_symetric(t, .25));
+    mu_assert_double_eq(10, td_trimmed_mean_symmetric(t, .25));
     mu_assert_double_eq(10, td_trimmed_mean(t, .25, .75));
     td_free(t);
 }
@@ -181,7 +181,7 @@ MU_TEST(test_trimmed_mean_complex) {
     // trimmed mean and mean should lead to 9.5 in here
     //    stats.trim_mean(x, 0.25)
     //    9.5
-    mu_assert_double_eq(9.5, td_trimmed_mean_symetric(t, .25));
+    mu_assert_double_eq(9.5, td_trimmed_mean_symmetric(t, .25));
     mu_assert_double_eq(9.5, td_trimmed_mean(t, .25, .75));
     td_free(t);
     t = td_new(100);
@@ -195,8 +195,10 @@ MU_TEST(test_trimmed_mean_complex) {
     //    x = np.arange(200)
     //    stats.trim_mean(x, 0.25)
     //    99.5
-    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean_symetric(t, .25), 0.1);;
-    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean(t, .25, .75), 0.1);;
+    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean_symmetric(t, .25), 0.1);
+    ;
+    mu_assert_double_eq_epsilon(99.5, td_trimmed_mean(t, .25, .75), 0.1);
+    ;
     td_free(t);
     //    x = [1,2,3,4,5,6,7,8,9,10,100,100,100]
     t = td_new(100);
@@ -206,11 +208,11 @@ MU_TEST(test_trimmed_mean_complex) {
     td_add(t, 100, 3);
     //    stats.trim_mean(x, 0.1)
     //    23.09090909090909
-    mu_assert_double_eq_epsilon(23.09090909090909, td_trimmed_mean_symetric(t, .1), 0.01);
+    mu_assert_double_eq_epsilon(23.09090909090909, td_trimmed_mean_symmetric(t, .1), 0.01);
     mu_assert_double_eq_epsilon(23.09090909090909, td_trimmed_mean(t, .1, .9), 0.01);
     //    stats.trim_mean(x, 0.25)
     //    7.0
-    mu_assert_double_eq_epsilon(7.0, td_trimmed_mean_symetric(t, .25), 0.01);
+    mu_assert_double_eq_epsilon(7.0, td_trimmed_mean_symmetric(t, .25), 0.01);
     mu_assert_double_eq_epsilon(7.0, td_trimmed_mean(t, .25, .75), 0.01);
     td_free(t);
 }

@@ -153,12 +153,12 @@ double td_quantile(td_histogram_t *h, double q);
 double td_trimmed_mean(td_histogram_t *h, double leftmost_cut, double rightmost_cut);
 
 /**
- * Returns the trimmed mean ignoring values outside given a symetric cutoff limits.
+ * Returns the trimmed mean ignoring values outside given a symmetric cutoff limits.
  *
  * @param proportion_to_cut Fraction to cut off of the left and right tails of the distribution.
  * @return The trimmed mean ignoring values outside given cutoff upper and lower limits;
  */
-double td_trimmed_mean_symetric(td_histogram_t *h, double proportion_to_cut);
+double td_trimmed_mean_symmetric(td_histogram_t *h, double proportion_to_cut);
 
 /**
  * Returns the current compression factor.
