@@ -127,6 +127,10 @@ MU_TEST(test_trimmed_mean_simple) {
     mu_assert(t != NULL, "created_histogram");
     mu_assert_double_eq(0, t->unmerged_weight);
     mu_assert_double_eq(0, t->merged_weight);
+    //    stats.trim_mean([], 0.49)
+    //    nan
+    mu_assert_double_eq(NAN, td_trimmed_mean_symmetric(t, .49));
+    mu_assert_double_eq(NAN, td_trimmed_mean(t, 0.49, 0.51));
     td_add(t, 5.0, 1);
     // with one data point, all quantiles lead to Rome
     // stats.trim_mean(x, 0.49)
