@@ -19,10 +19,7 @@ jobs:
       - checkout
       - run:
           name: Install CMAKE
-          command: |
-            apt update
-            apt install -y cmake
-
+          command: 'apt update -q && apt install -y cmake'
       - run:
           name: Pull Submodules
           command: git submodule update --init --recursive
@@ -46,7 +43,7 @@ jobs:
   build:
     docker:
       - image: "debian:stretch"
-    steps:  
+    steps:
       - run:
           name: Installing SUDO
           command: 'apt update && apt install -y sudo && rm -rf /var/lib/apt/lists/*'
@@ -81,7 +78,7 @@ jobs:
 workflows:
   commit:
     jobs:
-      - lint 
+      - lint
       - build
       - sanitize
   nightly:
