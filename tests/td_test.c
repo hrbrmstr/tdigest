@@ -200,9 +200,16 @@ MU_TEST(test_trimmed_mean_complex) {
     //    stats.trim_mean(x, 0.25)
     //    99.5
     mu_assert_double_eq_epsilon(99.5, td_trimmed_mean_symmetric(t, .25), 0.1);
-    ;
     mu_assert_double_eq_epsilon(99.5, td_trimmed_mean(t, .25, .75), 0.1);
-    ;
+
+    // Non symmetric trimmed means
+    //    trim_mean(x, 0.1, 0.75)
+    //    84.5
+    mu_assert_double_eq_epsilon(84.5, td_trimmed_mean(t, .1, 0.75), 0.1);
+    //    trim_mean(x, 0.0, 0.75)
+    //    74.5
+    mu_assert_double_eq_epsilon(74.5, td_trimmed_mean(t, .0, 0.75), 0.1);
+
     td_free(t);
     //    x = [1,2,3,4,5,6,7,8,9,10,100,100,100]
     t = td_new(100);
