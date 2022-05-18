@@ -51,7 +51,7 @@ ENDIF()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -std=c99")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c99")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 if(ENABLE_PROFILE)
   message(STATUS "Enabling profile flags.")
@@ -87,7 +87,7 @@ add_subdirectory("src")
 # --- Unit Tests ---
 ENABLE_TESTING()
 
-if(BUILD_TESTS)
+if(BUILD_TESTS OR BUILD_BENCHMARK)
   add_subdirectory("tests")
 endif(BUILD_TESTS)
 

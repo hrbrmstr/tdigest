@@ -8,7 +8,8 @@ INFER?=./deps/infer
 INFER_DOCKER?=redisbench/infer-linux64:1.0.0
 ROOT=$(shell pwd)
 SRCDIR := $(ROOT)/src
-TESTDIR := $(ROOT)/tests
+TESTDIR := $(ROOT)/tests/unit
+BENCHDIR := $(ROOT)/tests/benchmark
 
 
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS
@@ -54,7 +55,7 @@ ifndef CMAKE_PROFILE_OPTIONS
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=OFF \
 		-DENABLE_CODECOVERAGE=OFF \
-		-DBUILD_TESTS=ON \
+		-DBUILD_TESTS=OFF \
 		-DBUILD_BENCHMARK=ON \
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_PROFILE=ON
@@ -81,6 +82,17 @@ ifndef CMAKE_TEST_OPTIONS
 		-DENABLE_CODECOVERAGE=ON \
 		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
+endif
+
+ifndef CMAKE_BENCHMARK_OPTIONS
+	CMAKE_BENCHMARK_OPTIONS=\
+		-DBUILD_SHARED=ON \
+		-DBUILD_STATIC=OFF \
+		-DENABLE_CODECOVERAGE=OFF \
+		-DBUILD_TESTS=OFF \
+		-DBUILD_BENCHMARK=ON \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_PROFILE=OFF
 endif
 
 default: full
@@ -116,12 +128,14 @@ format:
 	clang-format -style=file -i $(SRCDIR)/*.h
 	clang-format -style=file -i $(TESTDIR)/*.c
 	clang-format -style=file -i $(TESTDIR)/*.h
+	clang-format -style=file -i $(BENCHDIR)/*.cpp
 
 lint:
 	clang-format -style=file -Werror -n $(SRCDIR)/*.c
 	clang-format -style=file -Werror -n $(SRCDIR)/*.h
 	clang-format -style=file -Werror -n $(TESTDIR)/*.c
 	clang-format -style=file -Werror -n $(TESTDIR)/*.h
+	clang-format -style=file -Werror -n $(BENCHDIR)/*.cpp
 
 # build all
 full:
@@ -144,7 +158,7 @@ profile: clean
 	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 2> $(basename $@).compiler_stedrr_output.txt )
 
 bench: clean
-	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
+	( mkdir -p build; cd build ; cmake $(CMAKE_BENCHMARK_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10
 
 perf-stat-bench:
