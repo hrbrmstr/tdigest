@@ -162,6 +162,10 @@ bench: clean
 	( mkdir -p build; cd build ; cmake $(CMAKE_BENCHMARK_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=10
 
+bench-quantile: clean
+	( mkdir -p build; cd build ; cmake $(CMAKE_BENCHMARK_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
+	$(SHOW) build/tests/histogram_benchmark  --benchmark_min_time=10 --benchmark_filter="BM_td_quantile_lognormal_dist_given_array*|BM_td_quantiles_*"
+
 perf-stat-bench:
 	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
 	$(SHOW) perf stat build/tests/histogram_benchmark --benchmark_min_time=10
