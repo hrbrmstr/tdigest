@@ -44,6 +44,7 @@ The following functions are implemented:
   - `td_merge`: Merge one t-Digest into another
   - `td_cdf`:  Returns the fraction of all points added which are &le; x.
   - `td_quantile`: Returns an estimate of the cutoff such that a specified fraction of the data added to the t-Digest would be less than or equal to the cutoff.
+  - `td_quantiles`: Returns an estimate of the cutoff such that a specified fraction of the data added to the t-Digest would be less than or equal to the given cutoffs.
   - `td_size`: Return the number of points that have been added to the t-Digest
   - `td_centroid_count`: Return the number of centroids being used by the t-Digest
   - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty

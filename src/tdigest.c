@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "tdigest.h"
+#include <errno.h>
 
 #ifndef TD_MALLOC_INCLUDE
 #define TD_MALLOC_INCLUDE "td_malloc.h"
@@ -369,6 +370,52 @@ double td_quantile(td_histogram_t *h, double q) {
     const double z1 = index - h->merged_weight - right_centroid_weight / 2.0;
     const double z2 = right_centroid_weight / 2 - z1;
     return weighted_average(h->nodes_mean[n - 1], z1, h->max, z2);
+}
+
+int td_quantiles(td_histogram_t *h, const double *quantiles, double *values, size_t length) {
+    td_compress(h);
+
+    if (NULL == quantiles || NULL == values) {
+        return EINVAL;
+    }
+
+    const int n = h->merged_nodes;
+    if (n == 0) {
+        for (size_t i = 0; i < length; i++) {
+            values[i] = NAN;
+        }
+        return 0;
+    }
+    if (n == 1) {
+        for (size_t i = 0; i < length; i++) {
+            const double requested_quantile = quantiles[i];
+
+            // q should be in [0,1]
+            if (requested_quantile < 0.0 || requested_quantile > 1.0 || h->merged_nodes == 0) {
+                values[i] = NAN;
+            } else {
+                // with one data point, all quantiles lead to Rome
+                values[i] = h->nodes_mean[0];
+            }
+        }
+        return 0;
+    }
+
+    // we know that there are at least two centroids now
+    // if the left centroid has more than one sample, we still know
+    // that one sample occurred at min so we can do some interpolation
+    const double left_centroid_weight = h->nodes_weight[0];
+
+    // if the right-most centroid has more than one sample, we still know
+    // that one sample occurred at max so we can do some interpolation
+    const double right_centroid_weight = h->nodes_weight[n - 1];
+
+    // to avoid allocations we use the values array for intermediate computation
+    // i.e. to store the expected cumulative count at each percentile
+    for (size_t qpos = 0; qpos < length; qpos++) {
+        values[qpos] = td_quantile(h, quantiles[qpos]);
+    }
+    return 0;
 }
 
 static double td_internal_trimmed_mean(const td_histogram_t *h, const double leftmost_weight,

@@ -144,6 +144,17 @@ double td_cdf(td_histogram_t *h, double x);
 double td_quantile(td_histogram_t *h, double q);
 
 /**
+ * Returns an estimate of the cutoff such that a specified fraction of the data
+ * added to this TDigest would be less than or equal to the cutoffs.
+ *
+ * @param quantiles The ordered percentiles array to get the values for.
+ * @param values Destination array containing the values at the given quantiles.
+ * The values array should be allocated by the caller.
+ * @return 0 on success, ENOMEM if the provided destination array is null.
+ */
+int td_quantiles(td_histogram_t *h, const double *quantiles, double *values, size_t length);
+
+/**
  * Returns the trimmed mean ignoring values outside given cutoff upper and lower limits.
  *
  * @param leftmost_cut Fraction to cut off of the left tail of the distribution.
