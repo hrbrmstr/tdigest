@@ -493,7 +493,7 @@ MU_TEST(test_quantiles_multiple) {
     mu_assert_double_eq_epsilon(9.999, values[11], 0.01);
     mu_assert_double_eq_epsilon(9.9999, values[12], 0.01);
     mu_assert_double_eq_epsilon(10.0, values[13], 0.001);
-
+    td_free(histogram);
     td_histogram_t *t = td_new(100);
     mu_assert(td_quantiles(t, percentiles, values, quantiles_arr_size) == 0,
               "td_quantiles return should be 0");
@@ -515,6 +515,7 @@ MU_TEST(test_quantiles_multiple) {
     for (int i = 0; i < quantiles_arr_size; ++i) {
         mu_assert(isnan(values[i]), " q should be in [0,1]");
     }
+    td_free(t);
 }
 
 MU_TEST_SUITE(test_suite) {
