@@ -101,7 +101,7 @@ void td_reset(td_histogram_t *h) {
         return;
     }
     h->min = __DBL_MAX__;
-    h->max = __DBL_MIN__;
+    h->max = -h->min;
     h->merged_nodes = 0;
     h->merged_weight = 0;
     h->unmerged_nodes = 0;
