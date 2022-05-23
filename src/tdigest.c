@@ -403,7 +403,7 @@ int td_quantiles(td_histogram_t *h, const double *quantiles, double *values, siz
             const double requested_quantile = quantiles[i];
 
             // q should be in [0,1]
-            if (requested_quantile < 0.0 || requested_quantile > 1.0 || h->merged_nodes == 0) {
+            if (requested_quantile < 0.0 || requested_quantile > 1.0) {
                 values[i] = NAN;
             } else {
                 // with one data point, all quantiles lead to Rome
