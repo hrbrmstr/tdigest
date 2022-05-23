@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "tdigest.h"
+#include <errno.h>
 
 #ifndef TD_MALLOC_INCLUDE
 #define TD_MALLOC_INCLUDE "td_malloc.h"
@@ -285,6 +286,70 @@ double td_cdf(td_histogram_t *h, double val) {
     return 1 - 0.5 / h->merged_weight;
 }
 
+static double td_internal_iterate_centroids_to_index(const td_histogram_t *h, const double index,
+                                                     const double left_centroid_weight,
+                                                     const int total_centroids, double *weightSoFar,
+                                                     int *node_pos) {
+    if (left_centroid_weight > 1 && index < left_centroid_weight / 2) {
+        // there is a single sample at min so we interpolate with less weight
+        return h->min + (index - 1) / (left_centroid_weight / 2 - 1) * (h->nodes_mean[0] - h->min);
+    }
+
+    // usually the last centroid will have unit weight so this test will make it moot
+    if (index > h->merged_weight - 1) {
+        return h->max;
+    }
+
+    // if the right-most centroid has more than one sample, we still know
+    // that one sample occurred at max so we can do some interpolation
+    const double right_centroid_weight = h->nodes_weight[total_centroids - 1];
+    const double right_centroid_mean = h->nodes_mean[total_centroids - 1];
+    if (right_centroid_weight > 1 && h->merged_weight - index <= right_centroid_weight / 2) {
+        return h->max - (h->merged_weight - index - 1) / (right_centroid_weight / 2 - 1) *
+                            (h->max - right_centroid_mean);
+    }
+
+    for (; *node_pos < total_centroids - 1; (*node_pos)++) {
+        const int i = *node_pos;
+        const double node_weight = h->nodes_weight[i];
+        const double node_weight_next = h->nodes_weight[i + 1];
+        const double node_mean = h->nodes_mean[i];
+        const double node_mean_next = h->nodes_mean[i + 1];
+        const double dw = (node_weight + node_weight_next) / 2;
+        if (*weightSoFar + dw > index) {
+            // centroids i and i+1 bracket our current point
+            // check for unit weight
+            double leftUnit = 0;
+            if (node_weight == 1) {
+                if (index - *weightSoFar < 0.5) {
+                    // within the singleton's sphere
+                    return node_mean;
+                } else {
+                    leftUnit = 0.5;
+                }
+            }
+            double rightUnit = 0;
+            if (node_weight_next == 1) {
+                if (*weightSoFar + dw - index <= 0.5) {
+                    // no interpolation needed near singleton
+                    return node_mean_next;
+                }
+                rightUnit = 0.5;
+            }
+            const double z1 = index - *weightSoFar - leftUnit;
+            const double z2 = *weightSoFar + dw - index - rightUnit;
+            return weighted_average(node_mean, z2, node_mean_next, z1);
+        }
+        *weightSoFar += dw;
+    }
+
+    // weightSoFar = totalWeight - weight[total_centroids-1]/2 (very nearly)
+    // so we interpolate out to max value ever seen
+    const double z1 = index - h->merged_weight - right_centroid_weight / 2.0;
+    const double z2 = right_centroid_weight / 2 - z1;
+    return weighted_average(right_centroid_mean, z1, h->max, z2);
+}
+
 double td_quantile(td_histogram_t *h, double q) {
     td_compress(h);
     // q should be in [0,1]
@@ -311,64 +376,64 @@ double td_quantile(td_histogram_t *h, double q) {
     // if the left centroid has more than one sample, we still know
     // that one sample occurred at min so we can do some interpolation
     const double left_centroid_weight = h->nodes_weight[0];
-    if (left_centroid_weight > 1 && index < left_centroid_weight / 2) {
-        // there is a single sample at min so we interpolate with less weight
-        return h->min + (index - 1) / (left_centroid_weight / 2 - 1) * (h->nodes_mean[0] - h->min);
+
+    // in between extremes we interpolate between centroids
+    double weightSoFar = left_centroid_weight / 2;
+    int i = 0;
+    return td_internal_iterate_centroids_to_index(h, index, left_centroid_weight, n, &weightSoFar,
+                                                  &i);
+}
+
+int td_quantiles(td_histogram_t *h, const double *quantiles, double *values, size_t length) {
+    td_compress(h);
+
+    if (NULL == quantiles || NULL == values) {
+        return EINVAL;
     }
 
-    // usually the last centroid will have unit weight so this test will make it moot
-    if (index > h->merged_weight - 1) {
-        return h->max;
+    const int n = h->merged_nodes;
+    if (n == 0) {
+        for (size_t i = 0; i < length; i++) {
+            values[i] = NAN;
+        }
+        return 0;
     }
+    if (n == 1) {
+        for (size_t i = 0; i < length; i++) {
+            const double requested_quantile = quantiles[i];
+
+            // q should be in [0,1]
+            if (requested_quantile < 0.0 || requested_quantile > 1.0) {
+                values[i] = NAN;
+            } else {
+                // with one data point, all quantiles lead to Rome
+                values[i] = h->nodes_mean[0];
+            }
+        }
+        return 0;
+    }
+
+    // we know that there are at least two centroids now
+    // if the left centroid has more than one sample, we still know
+    // that one sample occurred at min so we can do some interpolation
+    const double left_centroid_weight = h->nodes_weight[0];
 
     // if the right-most centroid has more than one sample, we still know
     // that one sample occurred at max so we can do some interpolation
     const double right_centroid_weight = h->nodes_weight[n - 1];
-    if (right_centroid_weight > 1 && h->merged_weight - index <= right_centroid_weight / 2) {
-        return h->max - (h->merged_weight - index - 1) / (right_centroid_weight / 2 - 1) *
-                            (h->max - h->nodes_mean[n - 1]);
-    }
 
     // in between extremes we interpolate between centroids
     double weightSoFar = left_centroid_weight / 2;
-    for (int i = 0; i < n - 1; i++) {
-        const double node_weight = h->nodes_weight[i];
-        const double node_weight_next = h->nodes_weight[i + 1];
-        const double node_mean = h->nodes_mean[i];
-        const double node_mean_next = h->nodes_mean[i + 1];
-        const double dw = (node_weight + node_weight_next) / 2;
-        if (weightSoFar + dw > index) {
-            // centroids i and i+1 bracket our current point
-            // check for unit weight
-            double leftUnit = 0;
-            if (node_weight == 1) {
-                if (index - weightSoFar < 0.5) {
-                    // within the singleton's sphere
-                    return node_mean;
-                } else {
-                    leftUnit = 0.5;
-                }
-            }
-            double rightUnit = 0;
-            if (node_weight_next == 1) {
-                if (weightSoFar + dw - index <= 0.5) {
-                    // no interpolation needed near singleton
-                    return node_mean_next;
-                }
-                rightUnit = 0.5;
-            }
-            const double z1 = index - weightSoFar - leftUnit;
-            const double z2 = weightSoFar + dw - index - rightUnit;
-            return weighted_average(node_mean, z2, node_mean_next, z1);
-        }
-        weightSoFar += dw;
-    }
+    int node_pos = 0;
 
-    // weightSoFar = totalWeight - weight[n-1]/2 (very nearly)
-    // so we interpolate out to max value ever seen
-    const double z1 = index - h->merged_weight - right_centroid_weight / 2.0;
-    const double z2 = right_centroid_weight / 2 - z1;
-    return weighted_average(h->nodes_mean[n - 1], z1, h->max, z2);
+    // to avoid allocations we use the values array for intermediate computation
+    // i.e. to store the expected cumulative count at each percentile
+    for (size_t qpos = 0; qpos < length; qpos++) {
+        const double index = quantiles[qpos] * h->merged_weight;
+        values[qpos] = td_internal_iterate_centroids_to_index(h, index, left_centroid_weight, n,
+                                                              &weightSoFar, &node_pos);
+    }
+    return 0;
 }
 
 static double td_internal_trimmed_mean(const td_histogram_t *h, const double leftmost_weight,

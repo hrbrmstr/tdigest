@@ -432,6 +432,23 @@ MU_TEST(test_td_min) {
     mu_assert_double_eq_epsilon(0.0, td_min(histogram), 0.001);
 }
 
+bool compare_double(double a, double b, double delta) {
+    if (fabs(a - b) < delta) {
+        return true;
+    }
+
+    printf("[compare_double] fabs(%f, %f) < %f == false\n", a, b, delta);
+    return false;
+}
+
+static bool compare_values(double a, double b, double variation) {
+    return compare_double(a, b, b * variation);
+}
+
+static bool compare_percentile(int64_t a, double b, double variation) {
+    return compare_values((double)a, b, variation);
+}
+
 MU_TEST(test_quantiles) {
     load_histograms();
     mu_assert_double_eq_epsilon(0.0, td_quantile(histogram, 0.0), 0.001);
@@ -450,6 +467,57 @@ MU_TEST(test_quantiles) {
     mu_assert_double_eq_epsilon(10.0, td_quantile(histogram, 1.0), 0.001);
 }
 
+MU_TEST(test_quantiles_multiple) {
+    load_histograms();
+    const size_t quantiles_arr_size = 14;
+    double values[14] = {0.0};
+    double percentiles[14] = {0.0, 0.1, 0.2, 0.3,   0.4,    0.5,     0.6,
+                              0.7, 0.8, 0.9, 0.999, 0.9999, 0.99999, 1.0};
+    mu_assert(td_quantiles(histogram, NULL, values, quantiles_arr_size) == EINVAL,
+              "td_quantiles on NULL percentiles should return EINVAL");
+    mu_assert(td_quantiles(histogram, percentiles, NULL, quantiles_arr_size) == EINVAL,
+              "td_quantiles on NULL values should return EINVAL");
+    mu_assert(td_quantiles(histogram, percentiles, values, quantiles_arr_size) == 0,
+              "td_quantiles return should be 0");
+    mu_assert_double_eq_epsilon(0.0, values[0], 0.001);
+    mu_assert_double_eq_epsilon(1.0, values[1], 0.02);
+    mu_assert_double_eq_epsilon(2.0, values[2], 0.02);
+    mu_assert_double_eq_epsilon(3.0, values[3], 0.03);
+    mu_assert_double_eq_epsilon(4.0, values[4], 0.04);
+    mu_assert_double_eq_epsilon(5.0, values[5], 0.05);
+    mu_assert_double_eq_epsilon(6.0, values[6], 0.04);
+    mu_assert_double_eq_epsilon(7.0, values[7], 0.03);
+    mu_assert_double_eq_epsilon(8.0, values[8], 0.02);
+    mu_assert_double_eq_epsilon(9.0, values[9], 0.02);
+    mu_assert_double_eq_epsilon(9.99, values[10], 0.01);
+    mu_assert_double_eq_epsilon(9.999, values[11], 0.01);
+    mu_assert_double_eq_epsilon(9.9999, values[12], 0.01);
+    mu_assert_double_eq_epsilon(10.0, values[13], 0.001);
+    td_free(histogram);
+    td_histogram_t *t = td_new(100);
+    mu_assert(td_quantiles(t, percentiles, values, quantiles_arr_size) == 0,
+              "td_quantiles return should be 0");
+    for (int i = 0; i < quantiles_arr_size; ++i) {
+        mu_assert(isnan(values[i]), "no data to examine");
+    }
+    td_add(t, 1, 1);
+    // with one data point, all quantiles lead to Rome
+    mu_assert(td_quantiles(t, percentiles, values, quantiles_arr_size) == 0,
+              "td_quantiles return should be 0");
+    for (int i = 0; i < quantiles_arr_size; ++i) {
+        mu_assert_double_eq_epsilon(1.0, values[i], 0.02);
+    }
+    // q should be in [0,1]
+    double percentiles_nans[14] = {-10.0, 10.1, 10.2, 10.3,   10.4,    10.5,     10.6,
+                                   10.7,  10.8, 10.9, -0.999, -0.9999, -0.99999, -1.0};
+    mu_assert(td_quantiles(t, percentiles_nans, values, quantiles_arr_size) == 0,
+              "td_quantiles return should be 0");
+    for (int i = 0; i < quantiles_arr_size; ++i) {
+        mu_assert(isnan(values[i]), " q should be in [0,1]");
+    }
+    td_free(t);
+}
+
 MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_basic);
     MU_RUN_TEST(test_compress_small);
@@ -464,6 +532,7 @@ MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_td_max);
     MU_RUN_TEST(test_td_min);
     MU_RUN_TEST(test_quantiles);
+    MU_RUN_TEST(test_quantiles_multiple);
     MU_RUN_TEST(test_trimmed_mean_simple);
     MU_RUN_TEST(test_trimmed_mean_complex);
 }
