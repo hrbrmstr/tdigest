@@ -42,7 +42,7 @@ jobs:
             CC=clang CXX=clang++ INFER=infer make static-analysis
   build:
     docker:
-      - image: "debian:stretch"
+      - image: "debian:bullseye"
     steps:
       - run:
           name: Installing SUDO
@@ -77,7 +77,7 @@ jobs:
           command: |
             apt update
             apt install python3-pip -y
-            pip3 install redisbench-admin>=0.9.10
+            pip3 install redisbench-admin
       - run:
           name: Benchmark
           command: |
