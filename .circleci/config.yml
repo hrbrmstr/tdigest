@@ -95,7 +95,8 @@ workflows:
   commit:
     jobs:
       - lint
-      - build
+      - build:
+          context: common
       - sanitize
   nightly:
     triggers:
@@ -106,4 +107,5 @@ workflows:
               only:
                 - master
     jobs:
-      - build
+      - build:
+          context: common
