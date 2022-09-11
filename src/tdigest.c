@@ -506,9 +506,14 @@ double td_trimmed_mean(td_histogram_t *h, double leftmost_cut, double rightmost_
     return td_internal_trimmed_mean(h, leftmost_weight, rightmost_weight);
 }
 
-void td_add(td_histogram_t *h, double mean, double weight) {
+int td_add(td_histogram_t *h, double mean, double weight) {
     if (should_td_compress(h)) {
         td_compress(h);
+    }
+    const double new_unmerged_weight = h->unmerged_weight + weight;
+    // double-precision overflow detected on h->unmerged_weight
+    if (new_unmerged_weight == INFINITY) {
+        return EDOM;
     }
     if (mean < h->min) {
         h->min = mean;
@@ -520,7 +525,8 @@ void td_add(td_histogram_t *h, double mean, double weight) {
     h->nodes_mean[pos] = mean;
     h->nodes_weight[pos] = weight;
     h->unmerged_nodes++;
-    h->unmerged_weight += weight;
+    h->unmerged_weight = new_unmerged_weight;
+    return 0;
 }
 
 void td_compress(td_histogram_t *h) {

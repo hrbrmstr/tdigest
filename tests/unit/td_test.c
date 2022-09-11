@@ -95,6 +95,16 @@ MU_TEST(test_basic) {
     td_free(t);
 }
 
+MU_TEST(test_overflow) {
+    td_histogram_t *t = td_new(10);
+    mu_assert(t != NULL, "created_histogram");
+    mu_assert_double_eq(0, t->unmerged_weight);
+    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert(td_add(t, 5.0, 1e308) == 0, "First insertion of 1e308");
+    mu_assert(td_add(t, 5.0, 1e308) == EDOM, "Second insertion of 1e308 should overflow");
+    td_free(t);
+}
+
 MU_TEST(test_quantile_interpolations) {
     td_histogram_t *t = td_new(10);
     mu_assert(t != NULL, "created_histogram");
@@ -535,6 +545,7 @@ MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_quantiles_multiple);
     MU_RUN_TEST(test_trimmed_mean_simple);
     MU_RUN_TEST(test_trimmed_mean_complex);
+    MU_RUN_TEST(test_overflow);
 }
 
 int main(int argc, char *argv[]) {

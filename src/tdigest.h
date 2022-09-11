@@ -102,8 +102,11 @@ void td_reset(td_histogram_t *h);
  *
  * @param val The value to add.
  * @param weight The weight of this point.
+ * @return 0 on success, EDOM if overflow was detected as a consequence of adding the provided
+ * weight.
+ *
  */
-void td_add(td_histogram_t *h, double val, double weight);
+int td_add(td_histogram_t *h, double val, double weight);
 
 /**
  * Re-examines a t-digest to determine whether some centroids are redundant.  If your data are
