@@ -443,14 +443,19 @@ MU_TEST(test_td_min) {
 }
 
 MU_TEST(test_td_init) {
+    td_histogram_t *t;
     // overflow detected
-    mu_assert_long_eq(1, td_init(10000000000000000, &histogram));
+    mu_assert_long_eq(1, td_init(10000000000000000, &t));
+    t = NULL;
     // bellow overflow
-    mu_assert_long_eq(0, td_init(1000, &histogram));
+    mu_assert_long_eq(0, td_init(1000, &t));
+    td_free(t);
 
-    mu_assert_long_eq(0, td_init(1000000, &histogram));
+    mu_assert_long_eq(0, td_init(1000000, &t));
+    td_free(t);
 
-    mu_assert_long_eq(0, td_init(100000000, &histogram));
+    mu_assert_long_eq(0, td_init(100000000, &t));
+    td_free(t);
 }
 
 bool compare_double(double a, double b, double delta) {
