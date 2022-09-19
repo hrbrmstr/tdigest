@@ -442,6 +442,22 @@ MU_TEST(test_td_min) {
     mu_assert_double_eq_epsilon(0.0, td_min(histogram), 0.001);
 }
 
+MU_TEST(test_td_init) {
+    td_histogram_t *t;
+    // overflow detected
+    mu_assert_long_eq(1, td_init(10000000000000000, &t));
+    t = NULL;
+    // bellow overflow
+    mu_assert_long_eq(0, td_init(1000, &t));
+    td_free(t);
+
+    mu_assert_long_eq(0, td_init(1000000, &t));
+    td_free(t);
+
+    mu_assert_long_eq(0, td_init(100000000, &t));
+    td_free(t);
+}
+
 bool compare_double(double a, double b, double delta) {
     if (fabs(a - b) < delta) {
         return true;
@@ -530,6 +546,7 @@ MU_TEST(test_quantiles_multiple) {
 
 MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_basic);
+    MU_RUN_TEST(test_td_init);
     MU_RUN_TEST(test_compress_small);
     MU_RUN_TEST(test_compress_large);
     MU_RUN_TEST(test_nans);

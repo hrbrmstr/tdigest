@@ -4,6 +4,7 @@
 #include <math.h>
 #include "tdigest.h"
 #include <errno.h>
+#include <stdint.h>
 
 #ifndef TD_MALLOC_INCLUDE
 #define TD_MALLOC_INCLUDE "td_malloc.h"
@@ -84,7 +85,13 @@ void td_qsort(double *means, double *weights, unsigned int start, unsigned int e
     }
 }
 
-static inline int cap_from_compression(double compression) { return (6 * (int)(compression)) + 10; }
+static inline size_t cap_from_compression(double compression) {
+    if ((size_t)compression > ((SIZE_MAX / sizeof(double) / 6) - 10)) {
+        return 0;
+    }
+
+    return (6 * (size_t)(compression)) + 10;
+}
 
 static inline bool should_td_compress(td_histogram_t *h) {
     return ((h->merged_nodes + h->unmerged_nodes) == h->cap);
@@ -111,21 +118,26 @@ void td_reset(td_histogram_t *h) {
 
 int td_init(double compression, td_histogram_t **result) {
 
-    const double capacity = cap_from_compression(compression);
+    const size_t capacity = cap_from_compression(compression);
+    if (capacity < 1) {
+        return 1;
+    }
     td_histogram_t *histogram;
     histogram = (td_histogram_t *)__td_calloc(1, sizeof(td_histogram_t));
     if (!histogram) {
         return 1;
     }
     histogram->cap = capacity;
-    histogram->compression = compression;
+    histogram->compression = (double)compression;
     td_reset(histogram);
     histogram->nodes_mean = (double *)__td_calloc(capacity, sizeof(double));
     if (!histogram->nodes_mean) {
+        td_free(histogram);
         return 1;
     }
     histogram->nodes_weight = (double *)__td_calloc(capacity, sizeof(double));
     if (!histogram->nodes_weight) {
+        td_free(histogram);
         return 1;
     }
     *result = histogram;
