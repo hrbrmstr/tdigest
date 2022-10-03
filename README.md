@@ -5,7 +5,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 [![Signed
 by](https://img.shields.io/badge/Keybase-Verified-brightgreen.svg)](https://keybase.io/hrbrmstr)
 ![Signed commit
-%](https://img.shields.io/badge/Signed_Commits-100%25-lightgrey.svg)
+%](https://img.shields.io/badge/Signed_Commits-0%25-lightgrey.svg)
 [![Linux build
 Status](https://travis-ci.org/hrbrmstr/tdigest.svg?branch=master)](https://travis-ci.org/hrbrmstr/tdigest)
 [![builds.sr.ht
@@ -48,28 +48,20 @@ Ertl](https://arxiv.org/abs/1902.04023) for more details on t-Digests.
 
 The following functions are implemented:
 
-  - `as.list.tdigest`: Serialize a tdigest object to an R list or
-    unserialize a serialized tdigest list back into a tdigest object
-  - `td_add`: Add a value to the t-Digest with the specified count
-  - `td_create`: Allocate a new histogram
-  - `td_merge`: Merge one t-Digest into another
-  - `td_quantile_of`: Return the quantile of the value
-  - `td_total_count`: Total items contained in the t-Digest
-  - `td_value_at`: Return the value at the specified quantile
-  - `tquantile`: Calculate sample quantiles from a t-Digest
+- `as.list.tdigest`: Serialize a tdigest object to an R list or
+  unserialize a serialized tdigest list back into a tdigest object
+- `td_add`: Add a value to the t-Digest with the specified count
+- `td_create`: Allocate a new histogram
+- `td_merge`: Merge one t-Digest into another
+- `td_quantile_of`: Return the quantile of the value
+- `td_total_count`: Total items contained in the t-Digest
+- `td_value_at`: Return the value at the specified quantile
+- `tquantile`: Calculate sample quantiles from a t-Digest
 
 ## Installation
 
 ``` r
-install.packages("tdigest", repos = "https://cinc.rud.is")
-# or
-remotes::install_git("https://git.rud.is/hrbrmstr/tdigest.git")
-# or
-remotes::install_git("https://git.sr.ht/~hrbrmstr/tdigest")
-# or
-remotes::install_gitlab("hrbrmstr/tdigest")
-# or
-remotes::install_bitbucket("hrbrmstr/tdigest")
+install.packages("tdigest") # NOTE: CRAN version is 0.3.0
 # or
 remotes::install_github("hrbrmstr/tdigest")
 ```
@@ -84,7 +76,7 @@ library(tdigest)
 
 # current version
 packageVersion("tdigest")
-## [1] '0.4.0'
+## [1] '0.4.1'
 ```
 
 ### Basic (Low-level interface)
@@ -201,19 +193,22 @@ microbenchmark::microbenchmark(
   r_quantile = quantile(x, c(0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 1))
 )
 ## Unit: microseconds
-##        expr      min        lq       mean    median        uq        max neval cld
-##     tdigest     8.02     9.175    20.2545    10.185    32.682     43.003   100  a 
-##  r_quantile 52657.60 53307.742 55924.6932 54093.988 56487.027 108778.946   100   b
+##        expr       min         lq        mean     median         uq       max neval cld
+##     tdigest     3.198     3.6695     7.97286     4.4485    12.5255    18.245   100  a 
+##  r_quantile 39631.461 39965.9800 40628.32106 40127.4380 40648.0970 43751.469   100   b
 ```
 
 ## tdigest Metrics
 
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
-| :----------- | -------: | ---: | --: | ---: | ----------: | ---: | -------: | ---: |
-| C            |        3 | 0.27 | 484 | 0.68 |          77 | 0.44 |       46 | 0.16 |
-| R            |        6 | 0.55 | 161 | 0.23 |          35 | 0.20 |      156 | 0.54 |
-| Rmd          |        1 | 0.09 |  44 | 0.06 |          47 | 0.27 |       58 | 0.20 |
-| C/C++ Header |        1 | 0.09 |  24 | 0.03 |          16 | 0.09 |       30 | 0.10 |
+|:-------------|---------:|-----:|----:|-----:|------------:|-----:|---------:|-----:|
+| C            |        3 | 0.14 | 486 | 0.34 |          77 | 0.22 |       46 | 0.08 |
+| R            |        6 | 0.27 | 161 | 0.11 |          35 | 0.10 |      156 | 0.27 |
+| Rmd          |        1 | 0.05 |  44 | 0.03 |          47 | 0.13 |       58 | 0.10 |
+| C/C++ Header |        1 | 0.05 |  24 | 0.02 |          16 | 0.05 |       30 | 0.05 |
+| SUM          |       11 | 0.50 | 715 | 0.50 |         175 | 0.50 |      290 | 0.50 |
+
+clock Package Metrics for tdigest
 
 ## Code of Conduct
 

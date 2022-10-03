@@ -1,3 +1,6 @@
+0.4.1
+* rchk fixes
+
 0.4.0
 * Serialization & deserialization of tdigest objects
 

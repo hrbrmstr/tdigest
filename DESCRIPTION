@@ -1,8 +1,8 @@
 Package: tdigest
 Type: Package
 Title: Wicked Fast, Accurate Quantiles Using t-Digests
-Version: 0.4.0
-Date: 2019-09-02
+Version: 0.4.1
+Date: 2022-10-03
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0001-5670-2640")),
@@ -37,5 +37,5 @@ Imports:
     magrittr,
     stats
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.1
 Language: en-US

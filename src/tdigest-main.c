@@ -45,9 +45,10 @@ SEXP Rtd_create(SEXP compression) {
   SEXP ptr;
   td_histogram_t *t = td_new(asReal(compression));
   if (t) {
-    ptr = R_MakeExternalPtr(t, install("tdigest"), R_NilValue);
+    ptr = PROTECT(R_MakeExternalPtr(t, install("tdigest"), R_NilValue));
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
-    setAttrib(ptr, install("class"), mkString("tdigest"));
+    setAttrib(ptr, install("class"), PROTECT(mkString("tdigest")));
+    UNPROTECT(2);
     return(ptr);
   } else {
     return(R_NilValue);
@@ -70,9 +71,10 @@ SEXP Rtdig(SEXP vec, SEXP compression) {
         if (!ISNAN(REAL(vec)[i])) td_add(t, REAL(vec)[i], 1);
       }
     }
-    ptr = R_MakeExternalPtr(t, install("tdigest"), R_NilValue);
+    ptr = PROTECT(R_MakeExternalPtr(t, install("tdigest"), R_NilValue));
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
-    setAttrib(ptr, install("class"), mkString("tdigest"));
+    setAttrib(ptr, install("class"), PROTECT(mkString("tdigest")));
+    UNPROTECT(2);
     return(ptr);
   } else {
     return(R_NilValue);
