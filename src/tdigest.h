@@ -42,11 +42,11 @@ struct td_histogram {
     // we run the merge in reverse every other merge to avoid left-to-right bias in merging
     long long total_compressions;
 
-    double merged_weight;
-    double unmerged_weight;
+    long long merged_weight;
+    long long unmerged_weight;
 
     double *nodes_mean;
-    double *nodes_weight;
+    long long *nodes_weight;
 };
 
 typedef struct td_histogram td_histogram_t;
@@ -106,7 +106,7 @@ void td_reset(td_histogram_t *h);
  * weight.
  *
  */
-int td_add(td_histogram_t *h, double val, double weight);
+int td_add(td_histogram_t *h, double val, long long weight);
 
 /**
  * Re-examines a t-digest to determine whether some centroids are redundant.  If your data are
@@ -190,7 +190,7 @@ int td_compression(td_histogram_t *h);
  *
  * @return The sum of the weights on all centroids.
  */
-double td_size(td_histogram_t *h);
+long long td_size(td_histogram_t *h);
 
 /**
  * Returns the number of centroids being used by this TDigest.
@@ -222,7 +222,7 @@ double td_max(td_histogram_t *h);
  *
  * @return The full centroids weight array.
  */
-const double *td_centroids_weight(td_histogram_t *h);
+const long long *td_centroids_weight(td_histogram_t *h);
 
 /**
  * Get the full centroids mean array for 'this' histogram.
@@ -241,7 +241,7 @@ const double *td_centroids_mean(td_histogram_t *h);
  *
  * @return The centroid weight.
  */
-double td_centroids_weight_at(td_histogram_t *h, int pos);
+long long td_centroids_weight_at(td_histogram_t *h, int pos);
 
 /**
  * Get the centroid mean for 'this' histogram and 'pos'.

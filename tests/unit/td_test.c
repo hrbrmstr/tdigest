@@ -21,42 +21,11 @@
 
 static double randfrom(double M, double N) { return M + (rand() / (RAND_MAX / (N - M))); }
 
-/**
- * Reference implementations for cdf if we have all data.
- */
-static double dist_cdf(double x, double *data, int data_length) {
-    double n1 = 0;
-    double n2 = 0;
-    for (size_t i = 0; i < data_length; i++) {
-        const double v = data[i];
-        n1 += (v < x) ? 1 : 0;
-        n2 += (v == x) ? 1 : 0;
-    }
-    return (n1 + n2 / 2.0) / data_length;
-}
-
-/**
- * Reference implementations for quantile if we have all data.
- */
-static double dist_quantile(double q, double *data, int data_length) {
-    if (data_length == 0) {
-        return NAN;
-    }
-    double index = q * data_length;
-    if (index < 0) {
-        index = 0;
-    }
-    if (index > data_length - 1) {
-        index = data_length - 1;
-    }
-    return data[(int)floor(index)];
-}
-
 int tests_run = 0;
 
 td_histogram_t *histogram = NULL;
 
-static void load_histograms() {
+static void load_histograms(void) {
     const int compression = 500;
 
     int i;
@@ -73,13 +42,13 @@ static void load_histograms() {
 MU_TEST(test_basic) {
     td_histogram_t *t = td_new(10);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
     mu_assert(td_add(t, 0.0, 1) == 0, "Insertion");
     // with one data point, all quantiles lead to Rome
     mu_assert_double_eq(0.0, td_quantile(t, .0));
     mu_assert_double_eq(0.0, td_quantile(t, 0.5));
-    mu_assert_double_eq(0.0, td_quantile(t, 1.0));
+    mu_assert_double_eq(0.0, td_quantile(t, 1));
     mu_assert(td_add(t, 10.0, 1) == 0, "Insertion");
     mu_assert_double_eq(0.0, td_min(t));
     mu_assert_double_eq(10.0, td_max(t));
@@ -99,18 +68,21 @@ MU_TEST(test_overflow) {
     td_histogram_t *t = td_new(10);
     td_histogram_t *t2 = td_new(10);
     mu_assert(t != NULL, "created_histogram");
-    // mu_assert(t2 != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
-    mu_assert_double_eq(0, t2->unmerged_weight);
-    mu_assert_double_eq(0, t2->merged_weight);
-    for (size_t i = 0; i < 4; i++) {
-        mu_assert(td_add(t, 5.0, 1e304) == 0, "Insertion of 1e304");
-    }
-    mu_assert(td_add(t, 5.0, 1e304) == EDOM, "5th insertion of 1e305 should overflow");
+    mu_assert(t2 != NULL, "created_histogram");
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t2->unmerged_weight);
+    mu_assert_long_eq(0, t2->merged_weight);
+    mu_assert(td_add(t, 5.0, __LONG_LONG_MAX__ - 1) == 0, "Insertion of __LONG_LONG_MAX__");
+    mu_assert(td_add(t, 5.0, __LONG_LONG_MAX__ - 1) == EDOM,
+              "second insertion of __LONG_LONG_MAX__ should overflow");
+    mu_assert_long_eq(__LONG_LONG_MAX__ - 1, t->merged_weight + t->unmerged_weight);
     // overflow on merge
-    mu_assert(td_add(t2, 5.0, 1e304) == 0, "First insertion of 1e304");
-    mu_assert(td_merge(t2, t) == EDOM, "Merge due to second insertion of 1e300 should overflow");
+    mu_assert(td_add(t2, 5.0, __LONG_LONG_MAX__ - 1) == 0, "First insertion of __LONG_LONG_MAX__");
+    mu_assert_long_eq(__LONG_LONG_MAX__ - 1, t2->merged_weight + t2->unmerged_weight);
+    mu_assert(td_add(t2, 1.0, 1) == 0, "Insertion of 1");
+    mu_assert(td_add(t2, 5.0, __LONG_LONG_MAX__ - 1) == EDOM,
+              "Second insertion of __LONG_LONG_MAX__");
     td_free(t);
     td_free(t2);
 }
@@ -122,50 +94,50 @@ MU_TEST(test_overflow_merge) {
     mu_assert(x != NULL, "created_histogram");
     mu_assert(y != NULL, "created_histogram");
     mu_assert(z != NULL, "created_histogram");
-    mu_assert_double_eq(0, x->unmerged_weight);
-    mu_assert_double_eq(0, x->merged_weight);
-    mu_assert_double_eq(0, y->unmerged_weight);
-    mu_assert_double_eq(0, y->merged_weight);
-    mu_assert(td_add(x, 1, 1.0) == 0, "Insertion of 1");
-    mu_assert(td_add(x, 2, 1.0) == 0, "Insertion of 2");
-    mu_assert(td_add(x, 3, 1.0) == 0, "Insertion of 3");
-    mu_assert(td_add(x, 4, 1.0) == 0, "Insertion of 4");
-    mu_assert(td_add(x, 5, 1.0) == 0, "Insertion of 5");
-    mu_assert(td_add(x, 6, 1.0) == 0, "Insertion of 6");
-    mu_assert(td_add(x, 7, 1.0) == 0, "Insertion of 7");
-    mu_assert(td_add(x, 8, 1.0) == 0, "Insertion of 8");
-    mu_assert(td_add(x, 9, 1.0) == 0, "Insertion of 9");
-    mu_assert(td_add(x, 10, 1.0) == 0, "Insertion of 10");
-    mu_assert(td_add(x, 11, 1.0) == 0, "Insertion of 11");
-    mu_assert(td_add(x, 12, 1.0) == 0, "Insertion of 12");
-    mu_assert(td_add(x, 13, 1.0) == 0, "Insertion of 13");
-    mu_assert(td_add(x, 14, 1.0) == 0, "Insertion of 14");
-    mu_assert(td_add(x, 15, 1.0) == 0, "Insertion of 15");
-    mu_assert(td_add(x, 16, 1.0) == 0, "Insertion of 16");
-    mu_assert(td_add(x, 17, 1.0) == 0, "Insertion of 17");
-    mu_assert(td_add(x, 18, 1.0) == 0, "Insertion of 18");
-    mu_assert(td_add(x, 19, 1.0) == 0, "Insertion of 19");
-    mu_assert(td_add(x, 20, 1.0) == 0, "Insertion of 20");
-    mu_assert(td_add(y, 101, 1.0) == 0, "Insertion of 101");
-    mu_assert(td_add(y, 102, 1.0) == 0, "Insertion of 102");
-    mu_assert(td_add(y, 103, 1.0) == 0, "Insertion of 103");
-    mu_assert(td_add(y, 104, 1.0) == 0, "Insertion of 104");
-    mu_assert(td_add(y, 105, 1.0) == 0, "Insertion of 105");
-    mu_assert(td_add(y, 106, 1.0) == 0, "Insertion of 106");
-    mu_assert(td_add(y, 107, 1.0) == 0, "Insertion of 107");
-    mu_assert(td_add(y, 108, 1.0) == 0, "Insertion of 108");
-    mu_assert(td_add(y, 109, 1.0) == 0, "Insertion of 109");
-    mu_assert(td_add(y, 110, 1.0) == 0, "Insertion of 110");
-    mu_assert(td_add(y, 111, 1.0) == 0, "Insertion of 111");
-    mu_assert(td_add(y, 112, 1.0) == 0, "Insertion of 112");
-    mu_assert(td_add(y, 113, 1.0) == 0, "Insertion of 113");
-    mu_assert(td_add(y, 114, 1.0) == 0, "Insertion of 114");
-    mu_assert(td_add(y, 115, 1.0) == 0, "Insertion of 115");
-    mu_assert(td_add(y, 116, 1.0) == 0, "Insertion of 116");
-    mu_assert(td_add(y, 117, 1.0) == 0, "Insertion of 117");
-    mu_assert(td_add(y, 118, 1.0) == 0, "Insertion of 118");
-    mu_assert(td_add(y, 119, 1.0) == 0, "Insertion of 119");
-    mu_assert(td_add(y, 120, 1.0) == 0, "Insertion of 120");
+    mu_assert_long_eq(0, x->unmerged_weight);
+    mu_assert_long_eq(0, x->merged_weight);
+    mu_assert_long_eq(0, y->unmerged_weight);
+    mu_assert_long_eq(0, y->merged_weight);
+    mu_assert(td_add(x, 1, 1) == 0, "Insertion of 1");
+    mu_assert(td_add(x, 2, 1) == 0, "Insertion of 2");
+    mu_assert(td_add(x, 3, 1) == 0, "Insertion of 3");
+    mu_assert(td_add(x, 4, 1) == 0, "Insertion of 4");
+    mu_assert(td_add(x, 5, 1) == 0, "Insertion of 5");
+    mu_assert(td_add(x, 6, 1) == 0, "Insertion of 6");
+    mu_assert(td_add(x, 7, 1) == 0, "Insertion of 7");
+    mu_assert(td_add(x, 8, 1) == 0, "Insertion of 8");
+    mu_assert(td_add(x, 9, 1) == 0, "Insertion of 9");
+    mu_assert(td_add(x, 10, 1) == 0, "Insertion of 10");
+    mu_assert(td_add(x, 11, 1) == 0, "Insertion of 11");
+    mu_assert(td_add(x, 12, 1) == 0, "Insertion of 12");
+    mu_assert(td_add(x, 13, 1) == 0, "Insertion of 13");
+    mu_assert(td_add(x, 14, 1) == 0, "Insertion of 14");
+    mu_assert(td_add(x, 15, 1) == 0, "Insertion of 15");
+    mu_assert(td_add(x, 16, 1) == 0, "Insertion of 16");
+    mu_assert(td_add(x, 17, 1) == 0, "Insertion of 17");
+    mu_assert(td_add(x, 18, 1) == 0, "Insertion of 18");
+    mu_assert(td_add(x, 19, 1) == 0, "Insertion of 19");
+    mu_assert(td_add(x, 20, 1) == 0, "Insertion of 20");
+    mu_assert(td_add(y, 101, 1) == 0, "Insertion of 101");
+    mu_assert(td_add(y, 102, 1) == 0, "Insertion of 102");
+    mu_assert(td_add(y, 103, 1) == 0, "Insertion of 103");
+    mu_assert(td_add(y, 104, 1) == 0, "Insertion of 104");
+    mu_assert(td_add(y, 105, 1) == 0, "Insertion of 105");
+    mu_assert(td_add(y, 106, 1) == 0, "Insertion of 106");
+    mu_assert(td_add(y, 107, 1) == 0, "Insertion of 107");
+    mu_assert(td_add(y, 108, 1) == 0, "Insertion of 108");
+    mu_assert(td_add(y, 109, 1) == 0, "Insertion of 109");
+    mu_assert(td_add(y, 110, 1) == 0, "Insertion of 110");
+    mu_assert(td_add(y, 111, 1) == 0, "Insertion of 111");
+    mu_assert(td_add(y, 112, 1) == 0, "Insertion of 112");
+    mu_assert(td_add(y, 113, 1) == 0, "Insertion of 113");
+    mu_assert(td_add(y, 114, 1) == 0, "Insertion of 114");
+    mu_assert(td_add(y, 115, 1) == 0, "Insertion of 115");
+    mu_assert(td_add(y, 116, 1) == 0, "Insertion of 116");
+    mu_assert(td_add(y, 117, 1) == 0, "Insertion of 117");
+    mu_assert(td_add(y, 118, 1) == 0, "Insertion of 118");
+    mu_assert(td_add(y, 119, 1) == 0, "Insertion of 119");
+    mu_assert(td_add(y, 120, 1) == 0, "Insertion of 120");
 
     for (size_t i = 0; i < 10; i++) {
         td_histogram_t *zz = td_new(10);
@@ -193,16 +165,17 @@ MU_TEST(test_overflow_merge) {
 MU_TEST(test_quantile_interpolations) {
     td_histogram_t *t = td_new(10);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
     mu_assert(td_add(t, 5.0, 2) == 0, "add");
-    mu_assert_double_eq(1, t->unmerged_weight);
+    mu_assert_long_eq(2, t->unmerged_weight);
     // with one data point, all quantiles lead to Rome
-    mu_assert_double_eq(0.0, td_quantile(t, .0));
-    mu_assert_double_eq(0.0, td_quantile(t, 0.5));
+    mu_assert_double_eq(5.0, td_quantile(t, .0));
+    mu_assert_double_eq(5.0, td_quantile(t, 0.5));
+    mu_assert_double_eq(5.0, td_quantile(t, 1.0));
     mu_assert(td_compress(t) == 0, "compress");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(2.0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(2, t->merged_weight);
     mu_assert(td_add(t, 100.0, 1) == 0, "Insertion");
     // we know that there are at least two centroids now
     td_free(t);
@@ -220,8 +193,8 @@ MU_TEST(test_trimmed_mean_simple) {
      */
     td_histogram_t *t = td_new(100);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
     //    stats.trim_mean([], 0.49)
     //    nan
     mu_assert_double_eq(NAN, td_trimmed_mean_symmetric(t, .49));
@@ -238,17 +211,17 @@ MU_TEST(test_trimmed_mean_simple) {
     // 5.0
     // stats.trim_mean(x, 0.0)
     mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .0));
-    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1));
     // 5.0
     mu_assert(td_add(t, 5.0, 2) == 0, "Insertion");
     mu_assert_double_eq(5, td_trimmed_mean_symmetric(t, .0));
-    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1.0));
+    mu_assert_double_eq(5, td_trimmed_mean(t, 0.0, 1));
     mu_assert(td_add(t, 10.0, 1) == 0, "Insertion");
     mu_assert(td_add(t, 15.0, 3) == 0, "Insertion");
     //    stats.trim_mean(x, 0.0)
     //    10.0
     mu_assert_double_eq(10, td_trimmed_mean_symmetric(t, .0));
-    mu_assert_double_eq(10, td_trimmed_mean(t, 0.0, 1.0));
+    mu_assert_double_eq(10, td_trimmed_mean(t, 0.0, 1));
     // trimmed mean and mean should lead to 10 in here
     //    stats.trim_mean(x, 0.1)
     //    10.0
@@ -272,8 +245,8 @@ MU_TEST(test_trimmed_mean_complex) {
      */
     td_histogram_t *t = td_new(100);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
     for (int i = 0; i < 20; ++i) {
         mu_assert(td_add(t, (double)i, 1) == 0, "Insertion");
     }
@@ -285,8 +258,8 @@ MU_TEST(test_trimmed_mean_complex) {
     td_free(t);
     t = td_new(100);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert_double_eq(0, t->unmerged_weight);
-    mu_assert_double_eq(0, t->merged_weight);
+    mu_assert_long_eq(0, t->unmerged_weight);
+    mu_assert_long_eq(0, t->merged_weight);
     for (int i = 0; i < 200; ++i) {
         mu_assert(td_add(t, (double)i, 1) == 0, "Insertion");
     }
@@ -326,20 +299,20 @@ MU_TEST(test_trimmed_mean_complex) {
 MU_TEST(test_compress_small) {
     td_histogram_t *t = td_new(100);
     mu_assert(t != NULL, "created_histogram");
-    mu_assert(td_add(t, 1.0, 1.0) == 0, "Insertion");
+    mu_assert(td_add(t, 1.0, 1) == 0, "Insertion");
     mu_assert_double_eq(1.0, td_min(t));
     mu_assert_double_eq(1.0, td_max(t));
     mu_assert_double_eq(1.0, td_size(t));
     mu_assert_int_eq(1, td_centroid_count(t));
     mu_assert_long_eq(0, t->total_compressions);
     mu_assert_double_eq(1.0, td_centroids_mean_at(t, 0));
-    mu_assert_double_eq(1.0, td_centroids_weight_at(t, 0));
+    mu_assert_long_eq(1, td_centroids_weight_at(t, 0));
     mu_assert_int_eq(1, t->unmerged_nodes);
     mu_assert_int_eq(0, t->merged_nodes);
     mu_assert(td_compress(t) == 0, "compress");
-    mu_assert_int_eq(1, t->unmerged_nodes + t->merged_nodes);
+    mu_assert_long_eq(1, t->unmerged_nodes + t->merged_nodes);
     mu_assert_double_eq(1.0, td_centroids_mean_at(t, 0));
-    mu_assert_double_eq(1.0, td_centroids_weight_at(t, 0));
+    mu_assert_long_eq(1, td_centroids_weight_at(t, 0));
     mu_assert_double_eq(1.0, td_quantile(t, 0.001));
     mu_assert_double_eq(1.0, td_quantile(t, 0.01));
     mu_assert_double_eq(1.0, td_quantile(t, 0.5));
@@ -387,7 +360,7 @@ MU_TEST(test_negative_values) {
     mu_assert_double_eq_epsilon(-98.5, td_quantile(t, 0.01), 0.75);
     mu_assert_double_eq_epsilon(98.5, td_quantile(t, 0.99), 0.75);
     mu_assert_double_eq(100, td_quantile(t, 0.999));
-    mu_assert_double_eq(100, td_quantile(t, 1.0));
+    mu_assert_double_eq(100, td_quantile(t, 1));
     td_free(t);
 }
 
@@ -410,7 +383,7 @@ MU_TEST(test_negative_values_merge) {
     mu_assert_double_eq_epsilon(-98.5, td_quantile(d1, 0.01), 0.75);
     mu_assert_double_eq_epsilon(98.5, td_quantile(d1, 0.99), 0.75);
     mu_assert_double_eq(100, td_quantile(d1, 0.999));
-    mu_assert_double_eq(100, td_quantile(d1, 1.0));
+    mu_assert_double_eq(100, td_quantile(d1, 1));
     td_free(d1);
     td_free(d2);
 }
@@ -432,9 +405,6 @@ MU_TEST(test_nans) {
     mu_assert(isnan(td_quantile(t, 0)), "empty value at 0");
     mu_assert(isnan(td_quantile(t, 0.5)), "empty value at .5");
     mu_assert(isnan(td_quantile(t, 1)), "empty value at 1");
-    mu_assert(isnan(td_centroids_weight_at(t, 1)),
-              "td_centroids_weight_at on pos > h->merged_nodes");
-    mu_assert(isnan(td_centroids_weight_at(t, -1)), "td_centroids_weight_at on pos < 0");
     mu_assert(isnan(td_centroids_mean_at(t, 1)), "td_centroids_mean_at on pos > h->merged_nodes");
     mu_assert(isnan(td_centroids_mean_at(t, -1)), "td_centroids_mean_at on pos < 0");
     mu_assert(td_add(t, 1, 1) == 0, "Insertion");
@@ -541,23 +511,6 @@ MU_TEST(test_td_init) {
     td_free(t);
 }
 
-bool compare_double(double a, double b, double delta) {
-    if (fabs(a - b) < delta) {
-        return true;
-    }
-
-    printf("[compare_double] fabs(%f, %f) < %f == false\n", a, b, delta);
-    return false;
-}
-
-static bool compare_values(double a, double b, double variation) {
-    return compare_double(a, b, b * variation);
-}
-
-static bool compare_percentile(int64_t a, double b, double variation) {
-    return compare_values((double)a, b, variation);
-}
-
 MU_TEST(test_quantiles) {
     load_histograms();
     mu_assert_double_eq_epsilon(0.0, td_quantile(histogram, 0.0), 0.001);
@@ -573,7 +526,7 @@ MU_TEST(test_quantiles) {
     mu_assert_double_eq_epsilon(9.99, td_quantile(histogram, 0.999), 0.01);
     mu_assert_double_eq_epsilon(9.999, td_quantile(histogram, 0.9999), 0.01);
     mu_assert_double_eq_epsilon(9.9999, td_quantile(histogram, 0.99999), 0.01);
-    mu_assert_double_eq_epsilon(10.0, td_quantile(histogram, 1.0), 0.001);
+    mu_assert_double_eq_epsilon(10.0, td_quantile(histogram, 1), 0.001);
 }
 
 MU_TEST(test_quantiles_multiple) {
@@ -643,6 +596,7 @@ MU_TEST_SUITE(test_suite) {
     MU_RUN_TEST(test_td_min);
     MU_RUN_TEST(test_quantiles);
     MU_RUN_TEST(test_quantiles_multiple);
+    MU_RUN_TEST(test_quantile_interpolations);
     MU_RUN_TEST(test_trimmed_mean_simple);
     MU_RUN_TEST(test_trimmed_mean_complex);
     MU_RUN_TEST(test_overflow);
