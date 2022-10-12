@@ -117,17 +117,21 @@ int td_add(td_histogram_t *h, double val, double weight);
  * This is a destructive operation that is not thread-safe.
  *
  * @param h The histogram you want to compress.
+ * @return 0 on success, EDOM if overflow was detected as a consequence of adding the provided
+ * weight. If overflow is detected the histogram is not changed.
  *
  */
-void td_compress(td_histogram_t *h);
+int td_compress(td_histogram_t *h);
 
 /**
  * Merges all of the values from 'from' to 'this' histogram.
  *
  * @param h "This" pointer
  * @param from Histogram to copy values from.
+ * * @return 0 on success, EDOM if overflow was detected as a consequence of merging the the
+ * provided histogram. If overflow is detected the original histogram is not detected.
  */
-void td_merge(td_histogram_t *h, td_histogram_t *from);
+int td_merge(td_histogram_t *h, td_histogram_t *from);
 
 /**
  * Returns the fraction of all points added which are &le; x.

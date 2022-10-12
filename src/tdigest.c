@@ -94,12 +94,37 @@ static inline size_t cap_from_compression(double compression) {
 }
 
 static inline bool should_td_compress(td_histogram_t *h) {
-    return ((h->merged_nodes + h->unmerged_nodes) == h->cap);
+    return ((h->merged_nodes + h->unmerged_nodes) >= (h->cap - 1));
 }
 
 static inline int next_node(td_histogram_t *h) { return h->merged_nodes + h->unmerged_nodes; }
 
-void td_compress(td_histogram_t *h);
+int td_compress(td_histogram_t *h);
+
+static inline int _check_overflow(const double v) {
+    // double-precision overflow detected on h->unmerged_weight
+    if (v == INFINITY) {
+        return EDOM;
+    }
+    return 0;
+}
+
+static inline int _check_td_overflow(const double new_unmerged_weight,
+                                     const double new_total_weight) {
+    // double-precision overflow detected on h->unmerged_weight
+    if (new_unmerged_weight == INFINITY) {
+        return EDOM;
+    }
+    if (new_total_weight == INFINITY) {
+        return EDOM;
+    }
+    const double denom = 2 * MM_PI * new_total_weight * log(new_total_weight);
+    if (denom == INFINITY) {
+        return EDOM;
+    }
+
+    return 0;
+}
 
 int td_centroid_count(td_histogram_t *h) { return next_node(h); }
 
@@ -123,7 +148,7 @@ int td_init(double compression, td_histogram_t **result) {
         return 1;
     }
     td_histogram_t *histogram;
-    histogram = (td_histogram_t *)__td_calloc(1, sizeof(td_histogram_t));
+    histogram = (td_histogram_t *)__td_malloc(sizeof(td_histogram_t));
     if (!histogram) {
         return 1;
     }
@@ -161,14 +186,17 @@ void td_free(td_histogram_t *histogram) {
     __td_free((void *)(histogram));
 }
 
-void td_merge(td_histogram_t *into, td_histogram_t *from) {
+int td_merge(td_histogram_t *into, td_histogram_t *from) {
     td_compress(into);
     td_compress(from);
     for (int i = 0; i < from->merged_nodes; i++) {
         const double mean = from->nodes_mean[i];
         const double count = from->nodes_weight[i];
-        td_add(into, mean, count);
+        if (td_add(into, mean, count) != 0) {
+            return EDOM;
+        }
     }
+    return 0;
 }
 
 double td_size(td_histogram_t *h) { return h->merged_weight + h->unmerged_weight; }
@@ -520,20 +548,26 @@ double td_trimmed_mean(td_histogram_t *h, double leftmost_cut, double rightmost_
 
 int td_add(td_histogram_t *h, double mean, double weight) {
     if (should_td_compress(h)) {
-        td_compress(h);
+        const int overflow_res = td_compress(h);
+        if (overflow_res != 0)
+            return overflow_res;
     }
-    const double new_unmerged_weight = h->unmerged_weight + weight;
-    // double-precision overflow detected on h->unmerged_weight
-    if (new_unmerged_weight == INFINITY) {
+    const int pos = next_node(h);
+    if (pos >= h->cap)
         return EDOM;
-    }
+    const double new_unmerged_weight = h->unmerged_weight + weight;
+    const double new_total_weight = new_unmerged_weight + h->merged_weight;
+    // double-precision overflow detected
+    const int overflow_res = _check_td_overflow(new_unmerged_weight, new_total_weight);
+    if (overflow_res != 0)
+        return overflow_res;
+
     if (mean < h->min) {
         h->min = mean;
     }
     if (mean > h->max) {
         h->max = mean;
     }
-    const int pos = next_node(h);
     h->nodes_mean[pos] = mean;
     h->nodes_weight[pos] = weight;
     h->unmerged_nodes++;
@@ -541,16 +575,27 @@ int td_add(td_histogram_t *h, double mean, double weight) {
     return 0;
 }
 
-void td_compress(td_histogram_t *h) {
+int td_compress(td_histogram_t *h) {
     if (h->unmerged_nodes == 0) {
-        return;
+        return 0;
     }
     int N = h->merged_nodes + h->unmerged_nodes;
     td_qsort(h->nodes_mean, h->nodes_weight, 0, N - 1);
     const double total_weight = h->merged_weight + h->unmerged_weight;
+    // double-precision overflow detected
+    const int overflow_res = _check_td_overflow(h->unmerged_weight, total_weight);
+    if (overflow_res != 0)
+        return overflow_res;
+    if (total_weight <= 1)
+        return 0;
     const double denom = 2 * MM_PI * total_weight * log(total_weight);
+    if (_check_overflow(denom) != 0)
+        return EDOM;
+
     // Compute the normalizer given compression and number of points.
     const double normalizer = h->compression / denom;
+    if (_check_overflow(normalizer) != 0)
+        return EDOM;
     int cur = 0;
     double weight_so_far = 0;
 
@@ -586,6 +631,7 @@ void td_compress(td_histogram_t *h) {
     h->unmerged_nodes = 0;
     h->unmerged_weight = 0;
     h->total_compressions++;
+    return 0;
 }
 
 double td_min(td_histogram_t *h) { return h->min; }
