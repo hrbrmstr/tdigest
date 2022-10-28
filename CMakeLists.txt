@@ -89,9 +89,9 @@ ENABLE_TESTING()
 
 if(BUILD_TESTS OR BUILD_BENCHMARK)
   add_subdirectory("tests")
-endif(BUILD_TESTS)
+endif()
 
 # --- Examples ---
 if(BUILD_EXAMPLES)
   add_subdirectory("examples")
-endif(BUILD_EXAMPLES)
+endif()
