@@ -412,11 +412,11 @@ static double td_internal_iterate_centroids_to_index(const td_histogram_t *h, co
 double td_quantile(td_histogram_t *h, double q) {
     td_compress(h);
     // q should be in [0,1]
-    if (q < 0.0 || q > 1.0 || h->merged_nodes == 0) {
+    if (q < 0.0 || q > 1.0 || h->merged_nodes + h->unmerged_nodes == 0) {
         return NAN;
     }
     // with one data point, all quantiles lead to Rome
-    if (h->merged_nodes == 1) {
+    if (h->merged_nodes + h->unmerged_nodes == 1) {
         return h->nodes_mean[0];
     }
 
