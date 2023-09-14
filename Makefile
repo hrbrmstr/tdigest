@@ -9,8 +9,6 @@ INFER_DOCKER?=redisbench/infer-linux64:1.0.0
 ROOT=$(shell pwd)
 SRCDIR := $(ROOT)/src
 TESTDIR := $(ROOT)/tests/unit
-BENCHDIR := $(ROOT)/tests/benchmark
-
 
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS
 	CMAKE_LIBRARY_SHARED_OPTIONS=\
@@ -18,7 +16,6 @@ ifndef CMAKE_LIBRARY_SHARED_OPTIONS
 		-DBUILD_STATIC=OFF \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
 endif
 
@@ -28,7 +25,6 @@ ifndef CMAKE_LIBRARY_STATIC_OPTIONS
 		-DBUILD_STATIC=ON \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
 endif
 
@@ -46,7 +42,6 @@ ifndef CMAKE_FULL_OPTIONS
 		-DBUILD_SHARED=ON \
 		-DBUILD_STATIC=ON \
 		-DBUILD_TESTS=ON \
-		-DBUILD_BENCHMARK=ON \
 		-DBUILD_EXAMPLES=ON
 endif
 
@@ -57,7 +52,6 @@ ifndef CMAKE_PROFILE_OPTIONS
 		-DBUILD_STATIC=OFF \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=ON \
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_PROFILE=ON
 endif
@@ -69,7 +63,6 @@ ifndef CMAKE_SANITIZE_OPTIONS
 		-DBUILD_STATIC=OFF \
 		-DENABLE_CODECOVERAGE=OFF \
 		-DBUILD_TESTS=ON \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_PROFILE=OFF \
 		-DENABLE_SANITIZERS=ON
@@ -81,32 +74,20 @@ ifndef CMAKE_TEST_OPTIONS
 		-DBUILD_STATIC=ON \
 		-DBUILD_TESTS=ON \
 		-DENABLE_CODECOVERAGE=ON \
-		-DBUILD_BENCHMARK=OFF \
 		-DBUILD_EXAMPLES=OFF
-endif
-
-ifndef CMAKE_BENCHMARK_OPTIONS
-	CMAKE_BENCHMARK_OPTIONS=\
-		-DBUILD_SHARED=ON \
-		-DBUILD_STATIC=OFF \
-		-DENABLE_CODECOVERAGE=OFF \
-		-DBUILD_TESTS=OFF \
-		-DBUILD_BENCHMARK=ON \
-		-DBUILD_EXAMPLES=OFF \
-		-DENABLE_PROFILE=OFF
 endif
 
 default: full
 
-# just build the static library. Do not build tests or benchmarks
+# just build the static library. Do not build tests 
 library_static:
 	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_STATIC_OPTIONS) .. ; $(MAKE) )
 
-# just build the shared library. Do not build tests or benchmarks
+# just build the shared library. Do not build tests 
 library_shared:
 	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_SHARED_OPTIONS) .. ; $(MAKE) )
 
-# just build the static and shared libraries. Do not build tests or benchmarks
+# just build the static and shared libraries. Do not build tests
 library_all:
 	( mkdir -p build; cd build ; cmake $(CMAKE_LIBRARY_OPTIONS) .. ; $(MAKE) )
 
@@ -157,26 +138,3 @@ sanitize: clean
 
 profile: clean
 	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 2> $(basename $@).compiler_stedrr_output.txt )
-
-bench: clean
-	( mkdir -p build; cd build ; cmake $(CMAKE_BENCHMARK_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
-	$(SHOW) build/tests/histogram_benchmark --benchmark_min_time=5 --benchmark_out=results.json --benchmark_out_format=json
-
-bench-quantile: clean
-	( mkdir -p build; cd build ; cmake $(CMAKE_BENCHMARK_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
-	$(SHOW) build/tests/histogram_benchmark  --benchmark_min_time=5 --benchmark_filter="BM_td_quantile_lognormal_dist_given_array*|BM_td_quantiles_*"
-
-perf-stat-bench:
-	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
-	$(SHOW) perf stat build/tests/histogram_benchmark --benchmark_min_time=10
-
-perf-record-bench: clean
-	( mkdir -p build; cd build ; cmake $(CMAKE_PROFILE_OPTIONS) .. ; $(MAKE) VERBOSE=1 )
-	$(SHOW) perf record -g -o perf.data.td_add \
-		build/tests/histogram_benchmark
-
-perf-report-bench:
-	$(SHOW) perf report -g "graph,0.5,caller" -i perf.data.td_add
-
-perf-report-bench-pprof:
-	go tool pprof -web perf.data.td_add
