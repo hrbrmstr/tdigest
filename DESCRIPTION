@@ -1,8 +1,8 @@
 Package: tdigest
 Type: Package
 Title: Wicked Fast, Accurate Quantiles Using t-Digests
-Version: 0.4.1
-Date: 2022-10-03
+Version: 0.4.2
+Date: 2024-06-19
 Authors@R: c(
     person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0001-5670-2640")),
@@ -12,7 +12,7 @@ Authors@R: c(
            comment = "Original C+ code; <https://github.com/ajwerner/tdigest>")
   )
 Description: The t-Digest construction algorithm, by 
-    Dunning et al., (2019) <arXiv:1902.04023v1>, uses a variant of 1-dimensional 
+    Dunning et al., (2019) <doi:10.48550/arXiv.1902.04023>, uses a variant of 1-dimensional 
     k-means clustering to produce a very compact data structure that allows 
     accurate estimation of quantiles. This t-Digest data structure can be used 
     to estimate quantiles, compute other rank statistics or even to estimate 
@@ -37,5 +37,5 @@ Imports:
     magrittr,
     stats
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 Language: en-US

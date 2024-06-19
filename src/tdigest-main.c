@@ -22,7 +22,7 @@
 #define O_MEANS 0
 #define O_COUNTS 1
 
-// next 2 ƒ() via <https://github.com/randy3k/xptr/blob/master/src/xptr.c>
+#define SAFE_REAL(x, i) (((double *)DATAPTR(x))[i])
 
 void check_is_xptr(SEXP s) {
   if (TYPEOF(s) != EXTPTRSXP) {
@@ -36,48 +36,53 @@ SEXP is_null_xptr_(SEXP s) {
 }
 
 static void td_finalizer(SEXP ptr) {
-  if(!R_ExternalPtrAddr(ptr)) return;
+  if (!R_ExternalPtrAddr(ptr)) return;
   td_free((td_histogram_t *)R_ExternalPtrAddr(ptr));
   R_ClearExternalPtr(ptr); /* not really needed */
 }
 
 SEXP Rtd_create(SEXP compression) {
   SEXP ptr;
-  td_histogram_t *t = td_new(asReal(compression));
+  td_histogram_t *t = td_new(Rf_asReal(compression));
   if (t) {
     ptr = PROTECT(R_MakeExternalPtr(t, install("tdigest"), R_NilValue));
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
     setAttrib(ptr, install("class"), PROTECT(mkString("tdigest")));
     UNPROTECT(2);
-    return(ptr);
+    return ptr;
   } else {
-    return(R_NilValue);
+    return R_NilValue;
   }
 }
 
 SEXP Rtdig(SEXP vec, SEXP compression) {
   SEXP ptr;
-  td_histogram_t *t = td_new(asReal(compression));
+  td_histogram_t *t = td_new(Rf_asReal(compression));
   if (t) {
     R_xlen_t n = Rf_xlength(vec);
     if (ALTREP(vec)) {
-      ITERATE_BY_REGION(vec, x, i, nbatch, double, REAL, {
-        for (R_xlen_t k = 0; k < nbatch; k++) {
-          if (!ISNAN(x[k])) td_add(t, x[k], 1);
+      R_xlen_t start = 0, end = 0;
+      while (start < n) {
+        end = start + 1;
+        while (end < n && !ISNAN(SAFE_REAL(vec, end))) end++;
+        for (R_xlen_t i = start; i < end; i++) {
+          if (!ISNAN(SAFE_REAL(vec, i))) td_add(t, SAFE_REAL(vec, i), 1);
         }
-      });
+        start = end + 1;
+      }
     } else {
+      double *data = (double *)DATAPTR(vec);
       for (R_xlen_t i = 0; i < n; i++) {
-        if (!ISNAN(REAL(vec)[i])) td_add(t, REAL(vec)[i], 1);
+        if (!ISNAN(data[i])) td_add(t, data[i], 1);
       }
     }
     ptr = PROTECT(R_MakeExternalPtr(t, install("tdigest"), R_NilValue));
     R_RegisterCFinalizerEx(ptr, td_finalizer, TRUE);
     setAttrib(ptr, install("class"), PROTECT(mkString("tdigest")));
     UNPROTECT(2);
-    return(ptr);
+    return ptr;
   } else {
-    return(R_NilValue);
+    return R_NilValue;
   }
 }
 
@@ -85,48 +90,49 @@ SEXP Rtquant(SEXP tdig, SEXP probs) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
   if (t) {
     R_xlen_t n = xlength(probs);
-    SEXP out = PROTECT(allocVector(REALSXP, n));
-    double *o = REAL(out);
+    SEXP out = PROTECT(Rf_allocVector(REALSXP, n));
+    double *out_data = (double *)DATAPTR(out);
+    double *probs_data = (double *)DATAPTR(probs);
     for (R_xlen_t i = 0; i < n; i++) {
-      o[i] = td_value_at(t, REAL(probs)[i]);
+      out_data[i] = td_value_at(t, probs_data[i]);
     }
     UNPROTECT(1);
-    return(out);
+    return out;
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rtd_add(SEXP tdig, SEXP val, SEXP count) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
   if (t) {
-    td_add(t, asReal(val), asReal(count)); //void td_add(td_histogram_t *h, double val, double count);
-    return(tdig);
+    td_add(t, Rf_asReal(val), Rf_asReal(count));
+    return tdig;
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rtd_value_at(SEXP tdig, SEXP q) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
   if (t) {
-    return(ScalarReal(td_value_at(t, asReal(q)))); //double td_value_at(td_histogram_t *h, double q);
+    return Rf_ScalarReal(td_value_at(t, Rf_asReal(q)));
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rtd_quantile_of(SEXP tdig, SEXP val) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
   if (t) {
-    return(ScalarReal(td_quantile_of(t, asReal(val)))); //double td_quantile_of(td_histogram_t *h, double val);
+    return Rf_ScalarReal(td_quantile_of(t, Rf_asReal(val)));
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rtd_total_count(SEXP tdig) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(tdig);
   if (t) {
-    return(ScalarReal(td_total_count(t))); //double td_total_count(td_histogram_t *h);
+    return Rf_ScalarReal(td_total_count(t));
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rtd_merge(SEXP from, SEXP into) {
@@ -134,53 +140,54 @@ SEXP Rtd_merge(SEXP from, SEXP into) {
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(into);
   if (t) {
     td_merge(t, f);
-    return(into); //void td_merge(td_histogram_t *into, td_histogram_t *from);
+    return into;
   }
-  return(R_NilValue);
+  return R_NilValue;
 }
 
 SEXP Rg_compression(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarReal(f->compression) : R_NilValue);
+  return f ? Rf_ScalarReal(f->compression) : R_NilValue;
 }
 
 SEXP Rg_cap(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarInteger(f->cap) : R_NilValue);
+  return f ? ScalarInteger(f->cap) : R_NilValue;
 }
 
 SEXP Rg_merged_nodes(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarInteger(f->merged_nodes) : R_NilValue);
+  return f ? ScalarInteger(f->merged_nodes) : R_NilValue;
 }
 
 SEXP Rg_unmerged_nodes(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarInteger(f->unmerged_nodes) : R_NilValue);
+  return f ? ScalarInteger(f->unmerged_nodes) : R_NilValue;
 }
 
 SEXP Rg_merged_count(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarReal(f->merged_count) : R_NilValue);
+  return f ? Rf_ScalarReal(f->merged_count) : R_NilValue;
 }
 
 SEXP Rg_unmerged_count(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-  return(f ? ScalarReal(f->unmerged_count) : R_NilValue);
+  return f ? Rf_ScalarReal(f->unmerged_count) : R_NilValue;
 }
 
 SEXP Rg_nodes_mean(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
   if (f) {
     int N = f->merged_nodes + f->unmerged_nodes;
-    SEXP out = PROTECT(allocVector(REALSXP, N));
-    for (int i=0; i<N; i++) {
-      REAL(out)[i] = f->nodes[i].mean;
+    SEXP out = PROTECT(Rf_allocVector(REALSXP, N));
+    double *out_data = (double *)DATAPTR(out);
+    for (int i = 0; i < N; i++) {
+      out_data[i] = f->nodes[i].mean;
     }
     UNPROTECT(1);
-    return(out);
+    return out;
   } else {
-    return(R_NilValue);
+    return R_NilValue;
   }
 }
 
@@ -188,38 +195,38 @@ SEXP Rg_nodes_count(SEXP from) {
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
   if (f) {
     int N = f->merged_nodes + f->unmerged_nodes;
-    SEXP out = PROTECT(allocVector(REALSXP, N));
-    for (int i=0; i<N; i++) {
-      REAL(out)[i] = f->nodes[i].count;
+    SEXP out = PROTECT(Rf_allocVector(REALSXP, N));
+    double *out_data = (double *)DATAPTR(out);
+    for (int i = 0; i < N; i++) {
+      out_data[i] = f->nodes[i].count;
     }
     UNPROTECT(1);
-    return(out);
+    return out;
   } else {
-    return(R_NilValue);
+    return R_NilValue;
   }
 }
 
 SEXP Rg_toR(SEXP from) {
-
   td_histogram_t *f = (td_histogram_t *)R_ExternalPtrAddr(from);
-
   if (f) {
-
     SEXP o_cap = PROTECT(ScalarInteger(f->cap));
-    SEXP o_compression = PROTECT(ScalarReal(f->compression));
-    SEXP o_mcount = PROTECT(ScalarReal(f->merged_count));
-    SEXP o_umcount = PROTECT(ScalarReal(f->unmerged_count));
+    SEXP o_compression = PROTECT(Rf_ScalarReal(f->compression));
+    SEXP o_mcount = PROTECT(Rf_ScalarReal(f->merged_count));
+    SEXP o_umcount = PROTECT(Rf_ScalarReal(f->unmerged_count));
     SEXP o_mnodes = PROTECT(ScalarInteger(f->merged_nodes));
     SEXP o_umnodes = PROTECT(ScalarInteger(f->unmerged_nodes));
 
     int N = f->merged_nodes + f->unmerged_nodes;
 
-    SEXP o_means = PROTECT(allocVector(REALSXP, N));
-    SEXP o_counts = PROTECT(allocVector(REALSXP, N));
+    SEXP o_means = PROTECT(Rf_allocVector(REALSXP, N));
+    SEXP o_counts = PROTECT(Rf_allocVector(REALSXP, N));
+    double *means_data = (double *)DATAPTR(o_means);
+    double *counts_data = (double *)DATAPTR(o_counts);
 
-    for (int i=0; i<N; i++) {
-      REAL(o_means)[i] = f->nodes[i].mean;
-      REAL(o_counts)[i] = f->nodes[i].count;
+    for (int i = 0; i < N; i++) {
+      means_data[i] = f->nodes[i].mean;
+      counts_data[i] = f->nodes[i].count;
     }
 
     const char *names[] = {
@@ -257,26 +264,24 @@ SEXP Rg_toR(SEXP from) {
 
     UNPROTECT(10);
 
-    return(out);
+    return out;
 
   } else {
-    return(R_NilValue);
+    return R_NilValue;
   }
-
 }
 
 SEXP Rg_fromR(SEXP td_list) {
-
   SEXP out = PROTECT(Rtd_create(VECTOR_ELT(td_list, O_COMPRESSION)));
 
   td_histogram_t *t = (td_histogram_t *)R_ExternalPtrAddr(out);
 
-  t->compression = asReal(VECTOR_ELT(td_list, O_COMPRESSION));
+  t->compression = Rf_asReal(VECTOR_ELT(td_list, O_COMPRESSION));
   t->cap = asInteger(VECTOR_ELT(td_list, O_CAP));
   t->merged_nodes = asInteger(VECTOR_ELT(td_list, O_MNODES));
   t->unmerged_nodes = asInteger(VECTOR_ELT(td_list, O_UMNODES));
-  t->merged_count = asReal(VECTOR_ELT(td_list, O_MCOUNT));
-  t->unmerged_count = asReal(VECTOR_ELT(td_list, O_UMCOUNT));
+  t->merged_count = Rf_asReal(VECTOR_ELT(td_list, O_MCOUNT));
+  t->unmerged_count = Rf_asReal(VECTOR_ELT(td_list, O_UMCOUNT));
 
   int N = t->merged_nodes + t->unmerged_nodes;
 
@@ -284,14 +289,15 @@ SEXP Rg_fromR(SEXP td_list) {
 
   SEXP o_means = VECTOR_ELT(node_list, O_MEANS);
   SEXP o_counts = VECTOR_ELT(node_list, O_COUNTS);
+  double *means_data = (double *)DATAPTR(o_means);
+  double *counts_data = (double *)DATAPTR(o_counts);
 
-  for (int i=0; i<N; i++) {
-    t->nodes[i].count = REAL(o_counts)[i];
-    t->nodes[i].mean = REAL(o_means)[i];
+  for (int i = 0; i < N; i++) {
+    t->nodes[i].count = counts_data[i];
+    t->nodes[i].mean = means_data[i];
   }
 
   UNPROTECT(1);
 
-  return(out);
-
+  return out;
 }
