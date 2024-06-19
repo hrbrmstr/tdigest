@@ -1,5 +1,5 @@
 ---
-output: gfm
+format: gfm
 ---
 
 ```{r pkg-knitr-opts, include=FALSE}
