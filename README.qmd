@@ -1,11 +1,9 @@
 ---
 format: gfm
 ---
-
 ```{r pkg-knitr-opts, include=FALSE}
 hrbrpkghelpr::global_opts()
 ```
-
 # tdigest
 
 Wicked Fast, Accurate Quantiles Using 't-Digests'
