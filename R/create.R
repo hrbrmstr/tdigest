@@ -34,7 +34,7 @@
 #' quantile(td)
 tdigest <- function(vec, compression=100) {
   if (!is.double(vec)) vec <- as.double(vec)
-  .Call("Rtdig", vec=vec, compression=compression)
+  .Call("Rtdig", vec=vec, compression=compression, PACKAGE="tdigest")
 }
 
 #' Calculate sample quantiles from a t-Digest

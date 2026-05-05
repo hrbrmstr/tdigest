@@ -19,3 +19,7 @@
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^\.build\.yml$
+^CRAN-SUBMISSION$
+^\.corteza$
+^\.\.Rcheck$
+^tdigest.Rcheck$

@@ -7,3 +7,5 @@ README_cache
 src/*.o
 src/*.so
 src/*.dll
+..Rcheck
+tdigest.Rcheck
