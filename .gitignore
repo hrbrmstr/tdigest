@@ -9,3 +9,4 @@ src/*.so
 src/*.dll
 ..Rcheck
 tdigest.Rcheck
+tdigest*tar.gz
