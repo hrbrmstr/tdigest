@@ -1,21 +1,5 @@
 
 
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Signed
-by](https://img.shields.io/badge/Keybase-Verified-brightgreen.svg)](https://keybase.io/hrbrmstr)
-![Signed commit
-%](https://img.shields.io/badge/Signed_Commits-3%25-lightgrey.svg)
-
-[![cran
-checks](https://cranchecks.info/badges/worst/tdigest.png)](https://cranchecks.info/pkgs/tdigest)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/tdigest.png)](https://www.r-pkg.org/pkg/tdigest)
-![Minimal R
-Version](https://img.shields.io/badge/R%3E%3D-3.5.0-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-
 # tdigest
 
 Wicked Fast, Accurate Quantiles Using ‘t-Digests’
@@ -54,9 +38,6 @@ The following functions are implemented:
 ## Installation
 
 ``` r
-install.packages("tdigest") # NOTE: CRAN version is 0.4.1
-# or
-remotes::install_gitlab("hrbrmstr/tdigest")
 ```
 
 NOTE: To use the ‘remotes’ install options you will need to have the
@@ -69,7 +50,7 @@ library(tdigest)
 
 # current version
 packageVersion("tdigest")
-## [1] '0.4.2'
+## [1] '0.4.3'
 ```
 
 ### Basic (Low-level interface)
@@ -83,7 +64,7 @@ td
 td_total_count(td)
 ## [1] 0
 
-td_add(td, 0, 1) %>% 
+td_add(td, 0, 1) %>%
   td_add(10, 1)
 ## <tdigest; size=2; compression=10; cap=70>
 
@@ -195,10 +176,13 @@ microbenchmark::microbenchmark(
 
 | Lang         | \# Files |  (%) | LoC |  (%) | Blank lines |  (%) | \# Lines |  (%) |
 |:-------------|---------:|-----:|----:|-----:|------------:|-----:|---------:|-----:|
-| C            |        3 | 0.15 | 499 | 0.36 |          71 | 0.29 |       45 | 0.10 |
-| R            |        6 | 0.30 | 161 | 0.12 |          35 | 0.14 |      156 | 0.34 |
-| C/C++ Header |        1 | 0.05 |  24 | 0.02 |          16 | 0.07 |       30 | 0.06 |
-| SUM          |       10 | 0.50 | 684 | 0.50 |         122 | 0.50 |      231 | 0.50 |
+| C            |        3 | 0.11 | 499 | 0.26 |          71 | 0.17 |       45 | 0.08 |
+| R            |        7 | 0.25 | 252 | 0.13 |          88 | 0.22 |      201 | 0.36 |
+| CSS          |        1 | 0.04 | 115 | 0.06 |          25 | 0.06 |        2 | 0.00 |
+| HTML         |        1 | 0.04 |  47 | 0.02 |           4 | 0.01 |        0 | 0.00 |
+| C/C++ Header |        1 | 0.04 |  24 | 0.01 |          16 | 0.04 |       30 | 0.05 |
+| JSON         |        1 | 0.04 |  23 | 0.01 |           0 | 0.00 |        0 | 0.00 |
+| SUM          |       14 | 0.50 | 960 | 0.50 |         204 | 0.50 |      278 | 0.50 |
 
 {cloc} 📦 metrics for tdigest
 
